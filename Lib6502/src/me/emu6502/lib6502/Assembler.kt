@@ -221,13 +221,13 @@ class Assembler {
          */
         fun assemble(code: String): UByteArray {
             val lines = code.split("\n")
-                    .filter{ !it.startsWith("") }
+                    .map { it.trim() }
+                    .filter{ !it.startsWith(";") }
                     .filter{ it.isNotBlank() }
 
             val bytelist = arrayListOf<UByte>()
             for(line in lines) {
-                val trimmed = line.trim()
-                val spacesplit = trimmed.split(' ')
+                val spacesplit = line.split(' ')
                 val opcode = spacesplit[0]
                 var addr: UShort = 0.ushort
                 var op1: UByte = 0.ubyte
@@ -261,7 +261,7 @@ class Assembler {
                             bytelist.add(0x71.ubyte)
                             bytelist.add(op1)
                         } else
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                     }
                     "AND" -> {
                         if (checkImm(spacesplit[1], { op1 = it })) {
@@ -292,7 +292,7 @@ class Assembler {
                             bytelist.add(0x31.ubyte)
                             bytelist.add(op1)
                         } else
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                     }
                     "ASL" -> {
                         if (checkAccu(spacesplit[1])) {
@@ -312,15 +312,15 @@ class Assembler {
                             bytelist.add(BitConverter.GetBytes(addr)[0])
                             bytelist.add(BitConverter.GetBytes(addr)[1])
                         } else
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                     }
                     "BCC" -> {
                         if ((spacesplit[1].length > 3) || !spacesplit[1].startsWith("$"))
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                         try {
                             op1 = Integer.parseUnsignedInt(spacesplit[1].substring(1), 16).ubyte
                         }catch(e: NumberFormatException) {
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                         }
 
                         bytelist.add(0x90.ubyte)
@@ -328,22 +328,22 @@ class Assembler {
                     }
                     "BCS" -> {
                         if ((spacesplit[1].length > 3) || !spacesplit[1].startsWith("$"))
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                         try {
                             op1 = Integer.parseUnsignedInt(spacesplit[1].substring(1), 16).ubyte
                         }catch(e: NumberFormatException) {
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                         }
                         bytelist.add(0xB0.ubyte)
                         bytelist.add(op1)
                     }
                     "BEQ" -> {
                         if ((spacesplit[1].length > 3) || !spacesplit[1].startsWith("$"))
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                         try {
                             op1 = Integer.parseUnsignedInt(spacesplit[1].substring(1), 16).ubyte
                         }catch(e: NumberFormatException) {
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                         }
                         bytelist.add(0xF0.ubyte)
                         bytelist.add(op1)
@@ -357,37 +357,37 @@ class Assembler {
                             bytelist.add(BitConverter.GetBytes(addr)[0])
                             bytelist.add(BitConverter.GetBytes(addr)[1])
                         } else
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                     }
                     "BMI" -> {
                         if ((spacesplit[1].length > 3) || !spacesplit[1].startsWith("$"))
-                            throw IllegalArgumentException ("Ungültiger Operand" + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand" + line)
                         try {
                             op1 = Integer.parseUnsignedInt(spacesplit[1].substring(1), 16).ubyte
                         }catch(e: NumberFormatException) {
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                         }
                         bytelist.add(0x30.ubyte)
                         bytelist.add(op1)
                     }
                     "BNE" -> {
                         if ((spacesplit[1].length > 3) || !spacesplit[1].startsWith("$"))
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                         try {
                             op1 = Integer.parseUnsignedInt(spacesplit[1].substring(1), 16).ubyte
                         }catch(e: NumberFormatException) {
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                         }
                         bytelist.add(0xD0.ubyte)
                         bytelist.add(op1)
                     }
                     "BPL" -> {
                         if ((spacesplit[1].length > 3) || !spacesplit[1].startsWith("$"))
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                         try {
                             op1 = Integer.parseUnsignedInt(spacesplit[1].substring(1), 16).ubyte
                         }catch(e: NumberFormatException) {
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                         }
                         bytelist.add(0x10.ubyte)
                         bytelist.add(op1)
@@ -395,22 +395,22 @@ class Assembler {
                     "BRK" -> bytelist.add(0x00.ubyte)
                     "BVC" -> {
                         if ((spacesplit[1].length > 3) || !spacesplit[1].startsWith("$"))
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                         try {
                             op1 = Integer.parseUnsignedInt(spacesplit[1].substring(1), 16).ubyte
                         }catch(e: NumberFormatException) {
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                         }
                         bytelist.add(0x50.ubyte)
                         bytelist.add(op1)
                     }
                     "BVS" -> {
                         if ((spacesplit[1].length > 3) || !spacesplit[1].startsWith("$"))
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                         try {
                             op1 = Integer.parseUnsignedInt(spacesplit[1].substring(1), 16).ubyte
                         }catch(e: NumberFormatException) {
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                         }
                         bytelist.add(0x70.ubyte)
                         bytelist.add(op1)
@@ -448,7 +448,7 @@ class Assembler {
                             bytelist.add(0xD1.ubyte)
                             bytelist.add(op1)
                         } else
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                     }
                     "CPX" -> {
                         if (checkImm(spacesplit[1], { op1 = it })) {
@@ -462,7 +462,7 @@ class Assembler {
                             bytelist.add(BitConverter.GetBytes(addr)[0])
                             bytelist.add(BitConverter.GetBytes(addr)[1])
                         } else
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                     }
                     "CPY" -> {
                         if (checkImm(spacesplit[1], { op1 = it })) {
@@ -476,7 +476,7 @@ class Assembler {
                             bytelist.add(BitConverter.GetBytes(addr)[0])
                             bytelist.add(BitConverter.GetBytes(addr)[1])
                         } else
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                     }
                     "DEC" -> {
                         if (checkZP(spacesplit[1], { op1 = it })) {
@@ -494,7 +494,7 @@ class Assembler {
                             bytelist.add(BitConverter.GetBytes(addr)[0])
                             bytelist.add(BitConverter.GetBytes(addr)[1])
                         } else
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                     }
                     "DEX" -> bytelist.add(0xCA.ubyte)
                     "DEY" -> bytelist.add(0x88.ubyte)
@@ -527,7 +527,7 @@ class Assembler {
                             bytelist.add(0x51.ubyte)
                             bytelist.add(op1)
                         } else
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                     }
                     "INC" -> {
                         if (checkZP(spacesplit[1], { op1 = it })) {
@@ -545,7 +545,7 @@ class Assembler {
                             bytelist.add(BitConverter.GetBytes(addr)[0])
                             bytelist.add(BitConverter.GetBytes(addr)[1])
                         } else
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                     }
                     "INX" -> bytelist.add(0xE8.ubyte)
                     "INY" -> bytelist.add(0xC8.ubyte)
@@ -559,11 +559,11 @@ class Assembler {
                             bytelist.add(BitConverter.GetBytes(addr)[0])
                             bytelist.add(BitConverter.GetBytes(addr)[1])
                         } else
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                     }
                     "JSR" -> {
                         if (!checkAbs(spacesplit[1], { addr = it }))
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                         bytelist.add(0x20.ubyte)
                         bytelist.add(BitConverter.GetBytes(addr)[0])
                         bytelist.add(BitConverter.GetBytes(addr)[1])
@@ -597,7 +597,7 @@ class Assembler {
                             bytelist.add(0xB1.ubyte)
                             bytelist.add(op1)
                         } else
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                     }
                     "LDX" -> {
                         if (checkImm(spacesplit[1], { op1 = it })) {
@@ -618,7 +618,7 @@ class Assembler {
                             bytelist.add(BitConverter.GetBytes(addr)[0])
                             bytelist.add(BitConverter.GetBytes(addr)[1])
                         } else
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                     }
                     "LDY" -> {
                         if (checkImm(spacesplit[1], { op1 = it })) {
@@ -639,7 +639,7 @@ class Assembler {
                             bytelist.add(BitConverter.GetBytes(addr)[0])
                             bytelist.add(BitConverter.GetBytes(addr)[1])
                         } else
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                     }
                     "LSR" -> {
                         if (checkAccu(spacesplit[1])) {
@@ -659,7 +659,7 @@ class Assembler {
                             bytelist.add(BitConverter.GetBytes(addr)[0])
                             bytelist.add(BitConverter.GetBytes(addr)[1])
                         } else
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                     }
                     "NOP" -> bytelist.add(0xEA.ubyte)
                     "ORA" -> {
@@ -691,7 +691,7 @@ class Assembler {
                             bytelist.add(0x11.ubyte)
                             bytelist.add(op1)
                         } else
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                     }
                     "PHA" -> bytelist.add(0x48.ubyte)
                     "PHP" -> bytelist.add(0x08.ubyte)
@@ -715,7 +715,7 @@ class Assembler {
                             bytelist.add(BitConverter.GetBytes(addr)[0])
                             bytelist.add(BitConverter.GetBytes(addr)[1])
                         } else
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                     }
                     "ROR" -> {
                         if (checkAccu(spacesplit[1])) {
@@ -735,7 +735,7 @@ class Assembler {
                             bytelist.add(BitConverter.GetBytes(addr)[0])
                             bytelist.add(BitConverter.GetBytes(addr)[1])
                         } else
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                     }
                     "RTI" -> bytelist.add(0x40.ubyte)
                     "RTS" -> bytelist.add(0x60.ubyte)
@@ -768,7 +768,7 @@ class Assembler {
                             bytelist.add(0xF1.ubyte)
                             bytelist.add(op1)
                         } else
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                     }
                     "SEC" -> bytelist.add(0x38.ubyte)
                     "SED" -> bytelist.add(0xF8.ubyte)
@@ -799,7 +799,7 @@ class Assembler {
                             bytelist.add(0x91.ubyte)
                             bytelist.add(op1)
                         } else
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                     }
                     "STX" -> {
                         if (checkZP(spacesplit[1], { op1 = it })) {
@@ -813,7 +813,7 @@ class Assembler {
                             bytelist.add(BitConverter.GetBytes(addr)[0])
                             bytelist.add(BitConverter.GetBytes(addr)[1])
                         } else
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                     }
                     "STY" -> {
                         if (checkZP(spacesplit[1], { op1 = it })) {
@@ -827,7 +827,7 @@ class Assembler {
                             bytelist.add(BitConverter.GetBytes(addr)[0])
                             bytelist.add(BitConverter.GetBytes(addr)[1])
                         } else
-                            throw IllegalArgumentException ("Ungültiger Operand " + trimmed)
+                            throw IllegalArgumentException ("Ungültiger Operand " + line)
                     }
                     "TAX" -> bytelist.add(0xAA.ubyte)
                     "TAY" -> bytelist.add(0xA8.ubyte)
@@ -836,7 +836,7 @@ class Assembler {
                     "TXS" -> bytelist.add(0x9A.ubyte)
                     "TYA" -> bytelist.add(0x98.ubyte)
                     else ->
-                        throw IllegalArgumentException("Ungültiger Opcode " + trimmed)
+                        throw IllegalArgumentException("Ungültiger Opcode " + line)
                 }
             }
             return bytelist.toUByteArray()
