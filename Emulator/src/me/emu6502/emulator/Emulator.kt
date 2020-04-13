@@ -10,6 +10,7 @@ import ubyte
 import ushort
 import java.io.File
 import toString
+import uint
 import java.lang.Exception
 import kotlin.system.exitProcess
 
@@ -32,9 +33,9 @@ class Emulator {
 
         mainbus = Bus()
         ram = RAM(4096.ushort, 0x0000.ushort)
-        val bbytes: UByteArray = File("textscreen01.bin").readBytes().toUByteArray()
+        /*val bbytes: UByteArray = File("textscreen01.bin").readBytes().toUByteArray()
         for (pc in bbytes.indices)
-            ram.setData(bbytes[pc], (0x0200 + pc).ushort)
+            ram.setData(bbytes[pc], (0x0200 + pc).ushort)*/
         mainbus.devices.add(ram)
 
         rom = ROM(4096.ushort, 0xF000.ushort)
@@ -46,14 +47,14 @@ class Emulator {
         rom.setMemory(initrom)
         mainbus.devices.add(rom)
 
-        charrom = ROM(1024.ushort, 0xEC00.ushort)
-        charrom.setMemory(File("apple1.vid").readBytes().toUByteArray())
+        /*charrom = ROM(1024.ushort, 0xEC00.ushort)
+        charrom.setMemory(File("apple1.vid").readBytes().toUByteArray())*/
 
         screen = Screen(160, 120, 0xD000.ushort).apply { reset() }
         mainbus.devices.add(screen)
 
-        textscreen = TextScreen(40, 25, 0xD004.ushort).apply { reset() }
-        mainbus.devices.add(textscreen)
+        /*textscreen = TextScreen(40, 25, 0xD004.ushort).apply { reset() }
+        mainbus.devices.add(textscreen)*/
 
         cpu = CPU(mainbus).apply { PC = 0x0200.ushort }
     }
@@ -109,7 +110,7 @@ class Emulator {
             Console.clear()
             Console.writeLine(cpu)
             var line: Int = currentpage.toInt()
-            while(line < if((currentpage + 0x0400.ushort) > 65536.ushort) 65536 else currentpage.toInt() + 0x0400) {
+            while(line < if((currentpage + 0x0400.uint) > 65536.uint) 65536 else currentpage.toInt() + 0x0400) {
                 Console.write("$" + line.toString("X4") + ":")
                 for (pc in line until (line + 32))
                     Console.write(" $" + mainbus.getData(pc.ushort).toString("X2"))
@@ -117,7 +118,7 @@ class Emulator {
                 line += 32
             }
             Console.writeLine()
-            val inputLine = Console.readLine(">").trim()
+            val inputLine = Console.readLine("> ").trim()
             val cmdArgs = if(' ' in inputLine) inputLine.split(' ').toMutableList() else arrayListOf(inputLine)
             if(cmdArgs.isEmpty())
                 continue

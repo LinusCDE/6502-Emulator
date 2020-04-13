@@ -68,9 +68,9 @@ fun UInt.toString(format: String): String {
 
     var str = this.toString(radix)
     if(format[0].isLetter() && format[0].isUpperCase())
-        str.toUpperCase()
+        str = str.toUpperCase()
     else
-        str.toLowerCase()
+        str = str.toLowerCase()
 
     if(str.length > fixedLength)
         throw RuntimeException("Number $this is bigger than $fixedLength chars in base $radix")
