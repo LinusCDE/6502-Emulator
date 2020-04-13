@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="Emulator:jar" />
+    </artifacts-to-build>
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="ba504d93-14cf-40bb-b01d-26a827049c43" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/CPU.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/Disassembler.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KotlinUtils/me.emu6502.kotlinutils/Pair.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/ASM6502.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/Assembler.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/Bus.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/Bus.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/CPU6502.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/DisASM6502.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/EFlag.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/EFlag.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Emulator/Emulator.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Emulator/Emulator.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KotlinUtils/me.emu6502.kotlinutils/DatatypeConversion.kt" beforeDir="false" afterPath="$PROJECT_DIR$/KotlinUtils/me.emu6502.kotlinutils/DatatypeConversion.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,9 +24,11 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="Kotlin File" />
+        <option value="Kotlin Interface" />
         <option value="Kotlin Enum" />
         <option value="Kotlin Class" />
-        <option value="Kotlin File" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -37,7 +39,9 @@
     <executables />
   </component>
   <component name="ProjectId" id="1aRYw5yh2VcURilVUklhIieBFgv" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showExcludedFiles" value="true" />
@@ -45,7 +49,12 @@
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="Downloaded.Files.Path.Enabled" value="false" />
+    <property name="Repository.Attach.Annotations" value="false" />
+    <property name="Repository.Attach.JavaDocs" value="true" />
+    <property name="Repository.Attach.Sources" value="false" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="jdk.selected.JAVA_MODULE" value="1.8" />
@@ -54,6 +63,36 @@
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveKotlinTopLevelDeclarationsDialog.RECENTS_KEY">
+      <recent name="me.emu6502.emulator" />
+      <recent name="me.emu6502.emulator.vt100" />
+      <recent name="" />
+    </key>
+    <key name="CopyKotlinDeclarationDialog.RECENTS_KEY">
+      <recent name="me.emu6502.emulator.vt100" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="Emulator" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
+      <module name="Emulator" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="MAIN_CLASS_NAME" value="me.emu6502.emulator.Emulator" />
+      <option name="WORKING_DIRECTORY" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Kotlin.Emulator" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -67,7 +106,7 @@
       <updated>1586700108410</updated>
       <workItem from="1586700109515" duration="697000" />
       <workItem from="1586700827783" duration="23026000" />
-      <workItem from="1586774431756" duration="2194000" />
+      <workItem from="1586774431756" duration="33419000" />
     </task>
     <servers />
   </component>
@@ -79,57 +118,89 @@
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
     <state x="599" y="204" key="#Auto_Import/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586704605697" />
-    <state x="599" y="202" width="800" height="672" key="#Project_Structure" timestamp="1586701646079">
+    <state x="599" y="202" width="800" height="672" key="#Project_Structure" timestamp="1586776785820">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state x="599" y="202" width="800" height="672" key="#Project_Structure/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586701646079" />
-    <state x="457" y="198" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1586775493891">
+    <state x="599" y="202" width="800" height="672" key="#Project_Structure/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586776785820" />
+    <state x="457" y="198" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1586787773665">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state x="457" y="198" key="#com.intellij.execution.impl.EditConfigurationsDialog/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586775493891" />
-    <state x="794" y="261" key="#com.intellij.ide.util.MemberChooser" timestamp="1586703174235">
+    <state x="457" y="198" key="#com.intellij.execution.impl.EditConfigurationsDialog/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586787773665" />
+    <state x="794" y="261" key="#com.intellij.ide.util.MemberChooser" timestamp="1586802157471">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state x="794" y="261" key="#com.intellij.ide.util.MemberChooser/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586703174235" />
+    <state x="794" y="261" key="#com.intellij.ide.util.MemberChooser/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586802157471" />
+    <state x="735" y="328" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1586788614302">
+      <screen x="78" y="0" width="1842" height="1080" />
+    </state>
+    <state x="735" y="328" key="#com.intellij.ide.util.TreeClassChooserDialog/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586788614302" />
+    <state x="1111" y="277" key="#com.intellij.openapi.roots.ui.configuration.libraryEditor.LibraryEditorDialog" timestamp="1586803216781">
+      <screen x="78" y="0" width="1842" height="1080" />
+    </state>
+    <state x="1111" y="277" key="#com.intellij.openapi.roots.ui.configuration.libraryEditor.LibraryEditorDialog/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586803216781" />
     <state x="687" y="270" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1586704065705">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
     <state x="687" y="270" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586704065705" />
-    <state x="488" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1586775615994">
+    <state x="609" y="470" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog" timestamp="1586799205408">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state x="488" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586775615994" />
-    <state width="1874" height="327" key="GridCell.Tab.0.bottom" timestamp="1586731448064">
+    <state x="609" y="470" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586799205408" />
+    <state x="488" y="0" width="881" height="925" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1586801037919">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state width="1874" height="327" key="GridCell.Tab.0.bottom/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586731448064" />
-    <state width="1874" height="327" key="GridCell.Tab.0.center" timestamp="1586731448064">
+    <state x="488" y="0" width="881" height="925" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586801037919" />
+    <state x="736" y="300" key="#com.intellij.util.ui.classpath.ChooseLibrariesDialog" timestamp="1586803219299">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state width="1874" height="327" key="GridCell.Tab.0.center/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586731448064" />
-    <state width="1874" height="327" key="GridCell.Tab.0.left" timestamp="1586731448064">
+    <state x="736" y="300" key="#com.intellij.util.ui.classpath.ChooseLibrariesDialog/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586803219299" />
+    <state x="773" y="184" key="#org.jetbrains.kotlin.idea.refactoring.move.moveDeclarations.ui.MoveKotlinTopLevelDeclarationsDialog" timestamp="1586799200748">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state width="1874" height="327" key="GridCell.Tab.0.left/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586731448064" />
-    <state width="1874" height="327" key="GridCell.Tab.0.right" timestamp="1586731448064">
+    <state x="773" y="184" key="#org.jetbrains.kotlin.idea.refactoring.move.moveDeclarations.ui.MoveKotlinTopLevelDeclarationsDialog/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586799200748" />
+    <state width="1796" height="318" key="GridCell.Tab.0.bottom" timestamp="1586809253682">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state width="1874" height="327" key="GridCell.Tab.0.right/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586731448064" />
-    <state x="487" y="120" key="SettingsEditor" timestamp="1586701927747">
+    <state width="1796" height="318" key="GridCell.Tab.0.bottom/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586809253682" />
+    <state width="1796" height="318" key="GridCell.Tab.0.center" timestamp="1586809253682">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state x="487" y="120" key="SettingsEditor/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586701927747" />
-    <state x="468" y="141" width="1063" height="791" key="new project wizard" timestamp="1586701627359">
+    <state width="1796" height="318" key="GridCell.Tab.0.center/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586809253682" />
+    <state width="1796" height="318" key="GridCell.Tab.0.left" timestamp="1586809253682">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state x="468" y="141" width="1063" height="791" key="new project wizard/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586701627359" />
-    <state x="624" y="242" key="run.anything.popup" timestamp="1586727989616">
+    <state width="1796" height="318" key="GridCell.Tab.0.left/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586809253682" />
+    <state width="1796" height="318" key="GridCell.Tab.0.right" timestamp="1586809253682">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state x="624" y="242" key="run.anything.popup/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586727989616" />
-    <state x="662" y="239" width="672" height="678" key="search.everywhere.popup" timestamp="1586708535670">
+    <state width="1796" height="318" key="GridCell.Tab.0.right/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586809253682" />
+    <state x="487" y="120" width="1022" height="840" key="SettingsEditor" timestamp="1586803611595">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state x="662" y="239" width="672" height="678" key="search.everywhere.popup/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586708535670" />
+    <state x="487" y="120" width="1022" height="840" key="SettingsEditor/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586803611595" />
+    <state x="732" y="485" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1586803048427">
+      <screen x="78" y="0" width="1842" height="1080" />
+    </state>
+    <state x="732" y="485" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586803048427" />
+    <state x="651" y="156" width="695" height="771" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1586778637720">
+      <screen x="78" y="0" width="1842" height="1080" />
+    </state>
+    <state x="651" y="156" width="695" height="771" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586778637720" />
+    <state x="800" y="462" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1586796870182">
+      <screen x="78" y="0" width="1842" height="1080" />
+    </state>
+    <state x="800" y="462" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586796870182" />
+    <state x="468" y="141" width="1063" height="791" key="new project wizard" timestamp="1586776757674">
+      <screen x="78" y="0" width="1842" height="1080" />
+    </state>
+    <state x="468" y="141" width="1063" height="791" key="new project wizard/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586776757674" />
+    <state x="624" y="242" key="run.anything.popup" timestamp="1586805967746">
+      <screen x="78" y="0" width="1842" height="1080" />
+    </state>
+    <state x="624" y="242" key="run.anything.popup/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586805967746" />
+    <state x="662" y="239" width="672" height="678" key="search.everywhere.popup" timestamp="1586809207201">
+      <screen x="78" y="0" width="1842" height="1080" />
+    </state>
+    <state x="662" y="239" width="672" height="678" key="search.everywhere.popup/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586809207201" />
   </component>
 </project>

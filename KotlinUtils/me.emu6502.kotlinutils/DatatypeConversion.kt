@@ -51,9 +51,13 @@ infix fun UInt.minusSigned(other: Int): UInt = this - other.uint
 infix fun UShort.minusSigned(other: Int): UShort = (this - other.ushort).ushort
 infix fun UByte.minusSigned(other: Int): UByte = (this - other.ubyte).ubyte
 
-fun UByte.toString(format: String): String = this.ushort.toString(format);
+fun UByte.toString(format: String): String = this.uint.toString(format)
+fun UShort.toString(format: String): String = this.uint.toString(format)
+fun Int.toString(format: String): String = this.uint.toString(format)
 
-fun UShort.toString(format: String): String {
+fun ByteArray.toUByteArray() = UByteArray(this.size) { this[it].toUByte() }
+
+fun UInt.toString(format: String): String {
     val radix = when(format[0].toUpperCase()) {
         'X' -> 16
         'O' -> 8

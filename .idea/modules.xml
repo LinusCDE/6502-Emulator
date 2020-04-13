@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Emulator/Emulator.iml" filepath="$PROJECT_DIR$/Emulator/Emulator.iml" />
       <module fileurl="file://$PROJECT_DIR$/KotlinUtils/KotlinUtils.iml" filepath="$PROJECT_DIR$/KotlinUtils/KotlinUtils.iml" />
       <module fileurl="file://$PROJECT_DIR$/Lib6502/Lib6502.iml" filepath="$PROJECT_DIR$/Lib6502/Lib6502.iml" />
     </modules>
