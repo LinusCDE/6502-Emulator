@@ -1,11 +1,11 @@
 package me.emu6502.lib6502
 
 import int
-import minus
+import minusSigned
 import ubyte
 import ushort
 
-class RAM(size: UShort, start: UShort): Device(start, (start + size - 1).ushort) {
+class RAM(size: UShort, start: UShort): Device(start, (start + size minusSigned 1).ushort) {
 
     override fun setData(data: UByte, address: UShort) {
         if (request(address))

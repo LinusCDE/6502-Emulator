@@ -43,14 +43,13 @@ infix fun UByte.shr(bits: Int) = this.int.shr(bits).ubyte
 infix fun UShort.shl(bits: Int) = this.int.shl(bits).ushort
 infix fun UShort.shr(bits: Int) = this.int.shr(bits).ushort
 
-operator fun UInt.minus(other: Int) = this - other.uint
-operator fun UInt.plus(other: Int) = this + other.uint
+infix fun UInt.plusSigned(other: Int): UInt = this + other.uint
+infix fun UShort.plusSigned(other: Int): UShort = (this + other.ushort).ushort
+infix fun UByte.plusSigned(other: Int): UByte = (this + other.ubyte).ubyte
 
-operator fun UShort.minus(other: Int) = this - other.ushort
-operator fun UShort.plus(other: Int) = this + other.ushort
-
-operator fun Int.minus(other: UByte) = this - other.int
-operator fun Int.plus(other: UByte) = this + other.int
+infix fun UInt.minusSigned(other: Int): UInt = this - other.uint
+infix fun UShort.minusSigned(other: Int): UShort = (this - other.ushort).ushort
+infix fun UByte.minusSigned(other: Int): UByte = (this - other.ubyte).ubyte
 
 fun UByte.toString(format: String): String = this.ushort.toString(format);
 

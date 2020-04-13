@@ -2,11 +2,11 @@ package me.emu6502.lib6502
 
 import int
 import ushort
-import minus
+import minusSigned
 import ubyte
 import java.lang.IllegalArgumentException
 
-class ROM(size: UShort, start: UShort): Device(start, (start + size - 1).ushort) {
+class ROM(size: UShort, start: UShort): Device(start, (start + size minusSigned  1).ushort) {
 
     fun setMemory(mem: UByteArray) {
         if (mem.size != memory.size)
