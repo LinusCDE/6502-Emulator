@@ -11,8 +11,6 @@ class Bus {
 
     fun setData(data: UByte, address: UShort) = devices.firstOrNull { it.request(address) }?.setData(data, address)
 
-    fun setData(data: UByte, address: UInt) = setData(data, address.ushort)
-
     fun setData(data: UByte, address: UByte) = setData(data, address.ushort)
 
     fun getData(address: UInt): UByte = getData(address.ushort);

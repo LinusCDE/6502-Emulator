@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ba504d93-14cf-40bb-b01d-26a827049c43" name="Default Changelist" comment="" />
+    <list default="true" id="ba504d93-14cf-40bb-b01d-26a827049c43" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/CPU.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/Disassembler.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KotlinUtils/me.emu6502.kotlinutils/Pair.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/ASM6502.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/Assembler.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/Bus.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/Bus.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/CPU6502.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/DisASM6502.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/EFlag.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/EFlag.kt" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -23,6 +33,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="KonanWorkspace">
+    <executables />
+  </component>
   <component name="ProjectId" id="1aRYw5yh2VcURilVUklhIieBFgv" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -42,26 +55,6 @@
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
   </component>
-  <component name="RunManager">
-    <configuration name="TestsKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
-      <module name="KotlinUtils" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="MAIN_CLASS_NAME" value="TestsKt" />
-      <option name="WORKING_DIRECTORY" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Kotlin.TestsKt" />
-      </list>
-    </recent_temporary>
-  </component>
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -74,6 +67,7 @@
       <updated>1586700108410</updated>
       <workItem from="1586700109515" duration="697000" />
       <workItem from="1586700827783" duration="23026000" />
+      <workItem from="1586774431756" duration="2194000" />
     </task>
     <servers />
   </component>
@@ -89,6 +83,10 @@
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
     <state x="599" y="202" width="800" height="672" key="#Project_Structure/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586701646079" />
+    <state x="457" y="198" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1586775493891">
+      <screen x="78" y="0" width="1842" height="1080" />
+    </state>
+    <state x="457" y="198" key="#com.intellij.execution.impl.EditConfigurationsDialog/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586775493891" />
     <state x="794" y="261" key="#com.intellij.ide.util.MemberChooser" timestamp="1586703174235">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
@@ -97,6 +95,10 @@
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
     <state x="687" y="270" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586704065705" />
+    <state x="488" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1586775615994">
+      <screen x="78" y="0" width="1842" height="1080" />
+    </state>
+    <state x="488" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586775615994" />
     <state width="1874" height="327" key="GridCell.Tab.0.bottom" timestamp="1586731448064">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
