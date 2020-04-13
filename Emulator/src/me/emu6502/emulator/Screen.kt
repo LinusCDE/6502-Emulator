@@ -3,7 +3,6 @@ package me.emu6502.emulator
 import me.emu6502.lib6502.Device
 import plusSigned
 import ubyte
-import ushort
 import java.awt.Color
 
 open class Screen(width: Int, height: Int, startAddress: UShort): Device(startAddress, startAddress plusSigned 3) {

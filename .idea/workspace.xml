@@ -7,10 +7,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ba504d93-14cf-40bb-b01d-26a827049c43" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Emulator/Emulator.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Emulator/Emulator.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KotlinUtils/me.emu6502.kotlinutils/DatatypeConversion.kt" beforeDir="false" afterPath="$PROJECT_DIR$/KotlinUtils/me.emu6502.kotlinutils/DatatypeConversion.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Emulator/src/me/emu6502/emulator/Screen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Emulator/src/me/emu6502/emulator/Screen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KotlinUtils/KotlinUtils.iml" beforeDir="false" afterPath="$PROJECT_DIR$/KotlinUtils/KotlinUtils.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KotlinUtils/me.emu6502.kotlinutils/BitConverter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/KotlinUtils/src/me.emu6502.kotlinutils/BitConverter.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KotlinUtils/me.emu6502.kotlinutils/DatatypeConversion.kt" beforeDir="false" afterPath="$PROJECT_DIR$/KotlinUtils/src/me.emu6502.kotlinutils/DatatypeConversion.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KotlinUtils/me.emu6502.kotlinutils/Triple.kt" beforeDir="false" afterPath="$PROJECT_DIR$/KotlinUtils/src/me.emu6502.kotlinutils/Triple.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KotlinUtils/me.emu6502.kotlinutils/UByteArray2D.kt" beforeDir="false" afterPath="$PROJECT_DIR$/KotlinUtils/src/me.emu6502.kotlinutils/UByteArray2D.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KotlinUtils/me.emu6502.kotlinutils/vt100/VT100Attribute.kt" beforeDir="false" afterPath="$PROJECT_DIR$/KotlinUtils/src/me.emu6502.kotlinutils/vt100/VT100Attribute.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KotlinUtils/me.emu6502.kotlinutils/vt100/VT100BackgroundColor.kt" beforeDir="false" afterPath="$PROJECT_DIR$/KotlinUtils/src/me.emu6502.kotlinutils/vt100/VT100BackgroundColor.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KotlinUtils/me.emu6502.kotlinutils/vt100/VT100Display.kt" beforeDir="false" afterPath="$PROJECT_DIR$/KotlinUtils/src/me.emu6502.kotlinutils/vt100/VT100Display.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KotlinUtils/me.emu6502.kotlinutils/vt100/VT100ForegroundColor.kt" beforeDir="false" afterPath="$PROJECT_DIR$/KotlinUtils/src/me.emu6502.kotlinutils/vt100/VT100ForegroundColor.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KotlinUtils/me.emu6502.kotlinutils/vt100/VT100Sequence.kt" beforeDir="false" afterPath="$PROJECT_DIR$/KotlinUtils/src/me.emu6502.kotlinutils/vt100/VT100Sequence.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,6 +81,9 @@
     <key name="CopyKotlinDeclarationDialog.RECENTS_KEY">
       <recent name="me.emu6502.emulator.vt100" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/KotlinUtils/src" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration name="Emulator" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
@@ -106,7 +117,7 @@
       <updated>1586700108410</updated>
       <workItem from="1586700109515" duration="697000" />
       <workItem from="1586700827783" duration="23026000" />
-      <workItem from="1586774431756" duration="33419000" />
+      <workItem from="1586774431756" duration="35053000" />
     </task>
     <servers />
   </component>
@@ -158,26 +169,26 @@
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
     <state x="773" y="184" key="#org.jetbrains.kotlin.idea.refactoring.move.moveDeclarations.ui.MoveKotlinTopLevelDeclarationsDialog/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586799200748" />
-    <state width="1796" height="318" key="GridCell.Tab.0.bottom" timestamp="1586809253682">
+    <state width="1796" height="318" key="GridCell.Tab.0.bottom" timestamp="1586811482119">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state width="1796" height="318" key="GridCell.Tab.0.bottom/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586809253682" />
-    <state width="1796" height="318" key="GridCell.Tab.0.center" timestamp="1586809253682">
+    <state width="1796" height="318" key="GridCell.Tab.0.bottom/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586811482119" />
+    <state width="1796" height="318" key="GridCell.Tab.0.center" timestamp="1586811482119">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state width="1796" height="318" key="GridCell.Tab.0.center/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586809253682" />
-    <state width="1796" height="318" key="GridCell.Tab.0.left" timestamp="1586809253682">
+    <state width="1796" height="318" key="GridCell.Tab.0.center/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586811482119" />
+    <state width="1796" height="318" key="GridCell.Tab.0.left" timestamp="1586811482119">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state width="1796" height="318" key="GridCell.Tab.0.left/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586809253682" />
-    <state width="1796" height="318" key="GridCell.Tab.0.right" timestamp="1586809253682">
+    <state width="1796" height="318" key="GridCell.Tab.0.left/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586811482119" />
+    <state width="1796" height="318" key="GridCell.Tab.0.right" timestamp="1586811482119">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state width="1796" height="318" key="GridCell.Tab.0.right/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586809253682" />
-    <state x="487" y="120" width="1022" height="840" key="SettingsEditor" timestamp="1586803611595">
+    <state width="1796" height="318" key="GridCell.Tab.0.right/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586811482119" />
+    <state x="487" y="120" width="1022" height="840" key="SettingsEditor" timestamp="1586811467818">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state x="487" y="120" width="1022" height="840" key="SettingsEditor/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586803611595" />
+    <state x="487" y="120" width="1022" height="840" key="SettingsEditor/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586811467818" />
     <state x="732" y="485" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1586803048427">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
