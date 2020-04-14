@@ -30,8 +30,11 @@ class CommandCompleter() : Completer {
 
         // Complete first word
         val word = line.word()
-        for(command in commands)
-            if(command.value().startsWith(word) && !command.value().equals(""))
+        for(command in commands) {
+            if (command.value().startsWith(word) && command.value() != "")
                 candidates.add(command)
+            if(command.value() == "" && word == "")
+                candidates.add(command) // Show "" command when tabbing without anything typed
+        }
     }
 }
