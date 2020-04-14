@@ -5,7 +5,7 @@ class BitConverter  {
         fun GetBytes(value: UShort): UByteArray =
                 ubyteArrayOf(
                         (value and 0xFF.ushort).ubyte,
-                        ((value shr 8) and 0xFF.ushort).ubyte
+                        ((value shiftRight 8) and 0xFF.uint).ubyte
                 )
     }
 }

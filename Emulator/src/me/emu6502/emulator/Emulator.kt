@@ -44,6 +44,8 @@ class Emulator {
         Routines.pixelDspRoutine.forEachIndexed { i, byte -> initrom[0x0000 + i] = byte }
         Routines.charDspRoutine.forEachIndexed { i, byte -> initrom[0x001C + i] = byte }
 
+        Routines.testRoutine.forEachIndexed { i, byte -> ram.memory[0x0200 + i] = byte }
+
         rom.setMemory(initrom)
         mainbus.devices.add(rom)
 
@@ -160,7 +162,7 @@ class Emulator {
                     cpu.step()
                     mainbus.performClockActions()
                     screen.screenshot()
-                    textscreen.screenshot() // TODO: Screenshot of textscreen overwrites screenshot of screen!
+                    //textscreen.screenshot() // TODO: Screenshot of textscreen overwrites screenshot of screen!
                 }
                 "bl" -> {
                     Console.writeLine(breakpoints.map { it.toString("X4") }.joinToString(", "))
@@ -171,9 +173,10 @@ class Emulator {
                 "r" -> {
                     do {
                         cpu.step()
+                        mainbus.performClockActions()
                     } while (!breakpoints.contains(cpu.PC) && mainbus.getData(cpu.PC) != 0x00.ubyte)
                     screen.screenshot()
-                    textscreen.screenshot() // TODO: Screenshot of textscreen overwrites screenshot of screen!
+                    //textscreen.screenshot() // TODO: Screenshot of textscreen overwrites screenshot of screen!
                 }
                 else -> {
                     Console.writeLine("Unbekannter befehl! Drücke Tab für eine übersicht der Befehle.")

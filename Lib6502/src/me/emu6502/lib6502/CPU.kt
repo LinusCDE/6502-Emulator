@@ -2,8 +2,8 @@ package me.emu6502.lib6502
 
 import BitConverter
 import plusSigned
-import shl
-import shr
+import shiftLeft
+import shiftRight
 import toString
 import ubyte
 import uint
@@ -16,7 +16,7 @@ class CPU(val bus: Bus) {
 
     var cycles = 0
 
-    var PC: UShort = ((bus.getData(0xFFFD.ushort) shl 8) + bus.getData(0xFFFC.ushort)).ushort
+    var PC: UShort = ((bus.getData(0xFFFD.ushort) shiftLeft 8) + bus.getData(0xFFFC.ushort)).ushort
     var SP: UByte = 0xFF.ubyte
     var A: UByte = 0x00.ubyte
     var X: UByte = 0x00.ubyte
@@ -29,7 +29,7 @@ class CPU(val bus: Bus) {
 
     //region Helpers
     companion object {
-        fun checkBit(value: UByte, bit: Int): Boolean = ((value shl (7 - bit)) shr 7) == 1.ubyte
+        fun checkBit(value: UByte, bit: Int): Boolean = ((value shiftLeft (7 - bit)) shiftRight 7) == 1.uint
     }
 
     override fun toString(): String {
@@ -42,7 +42,7 @@ class CPU(val bus: Bus) {
     }
 
     fun reset() {
-        PC = ((bus.getData(0xFFFD.ushort) shl 8) + bus.getData(0xFFFC.ushort)).ushort
+        PC = ((bus.getData(0xFFFD.ushort) shiftLeft 8) + bus.getData(0xFFFC.ushort)).ushort
         SP = 0xFF.ubyte
         A = 0x00.ubyte
         X = 0x00.ubyte
@@ -50,12 +50,11 @@ class CPU(val bus: Bus) {
         SR = 0x20.ubyte //N V - - D I Z C
 
         cycles = 0
-        // TODO: Also reset NMI and IRQ?
     }
     //endregion
 
     //region Status register methods
-    private fun checkFlag(flag: UByte): Boolean = ((SR and flag) shr log2(flag.toDouble()).toInt()) == 1.ubyte
+    private fun checkFlag(flag: UByte): Boolean = ((SR and flag) shiftRight log2(flag.toDouble()).toInt()) == 1.uint
 
     private fun setFlag(flag: UByte, state: Boolean)
     {
@@ -88,7 +87,7 @@ class CPU(val bus: Bus) {
         pushToStack(BitConverter.GetBytes(PC)[0])
         pushToStack(SR)
         setFlag(EFlag.IRQ, true)
-        PC = ((bus.getData(0xFFFF.ushort) shl 8) + bus.getData(0xFFFE.ushort)).ushort
+        PC = ((bus.getData(0xFFFF.ushort) shiftLeft 8) + bus.getData(0xFFFE.ushort)).ushort
         cycles = 8
     }
 
@@ -98,25 +97,27 @@ class CPU(val bus: Bus) {
         pushToStack(SR)
         setFlag(EFlag.IRQ, true)
         NMI = false
-        PC = ((bus.getData(0xFFFB.ushort) shl 8) + bus.getData(0xFFFA.ushort)).ushort
+        PC = ((bus.getData(0xFFFB.ushort) shiftLeft 8) + bus.getData(0xFFFA.ushort)).ushort
         cycles = 8
     }
     //endregion
 
     //region Addressing modes
-    private fun getRelAddr(): UShort = (PC + (bus.getData(PC plusSigned  1) + 2.uint)).ushort
+    //private fun getRelAddr(): UShort = (PC + (bus.getData(PC plusSigned 1) + 2.uint)).ushortrr
+    private fun getRelAddr(): UShort = (PC.toInt() + (bus.getData(PC plusSigned 1).toByte() + 2)).ushort
 
-    private fun getAbsAddr(): UShort = ((bus.getData(PC plusSigned  2) shl 8) + bus.getData(PC plusSigned  1)).ushort
+    private fun getAbsAddr(): UShort = ((bus.getData(PC plusSigned 2) shiftLeft  8) + bus.getData(PC plusSigned 1)).ushort
+    // private ushort GetAbsAddr() => (ushort)((Bus.GetData((ushort)(PC + 2)) << 8) + Bus.GetData((ushort)(PC + 1)));
 
     private fun getAbsXAddr(onUpdateWrap: (newWrap: Boolean) -> Unit): UShort{
         onUpdateWrap((bus.getData((PC plusSigned 1)) + X) > 0xFF.ushort)
-        return ((bus.getData(PC plusSigned  2) shl 8) + bus.getData(PC plusSigned  1) + X + (if (SR and EFlag.CAR == 1.ubyte) 1 else 0).ushort).ushort
+        return ((bus.getData(PC plusSigned  2) shiftLeft 8) + bus.getData(PC plusSigned  1) + X + (if (SR and EFlag.CAR == 1.ubyte) 1 else 0).ushort).ushort
     }
 
     private fun getAbsYAddr(onUpdateWrap: (newWrap: Boolean) -> Unit): UShort
     {
         onUpdateWrap((bus.getData(PC plusSigned  1) + X).ushort > 0xFF.ushort)
-        return ((bus.getData(PC plusSigned 2) shl 8) + bus.getData(PC plusSigned  1) + Y + (if (SR and EFlag.CAR == 1.ubyte) 1 else 0).ushort).ushort
+        return ((bus.getData(PC plusSigned 2) shiftLeft 8) + bus.getData(PC plusSigned  1) + Y + (if (SR and EFlag.CAR == 1.ubyte) 1 else 0).ushort).ushort
     }
 
     private fun getZPAddr(): UByte = bus.getData((PC + 1.ushort).ushort)
@@ -128,14 +129,14 @@ class CPU(val bus: Bus) {
     private fun getIndXAddr(): UShort
     {
         val index = (bus.getData(PC plusSigned  1) + X).ubyte
-        return ((bus.getData(index + 1.ubyte) shl 8) + bus.getData(index.ushort)).ushort
+        return ((bus.getData(index + 1.ubyte) shiftLeft 8) + bus.getData(index.ushort)).ushort
     }
 
     private fun getIndYAddr(onUpdateWrap: (newWrap: Boolean) -> Unit): UShort
     {
         val index = bus.getData(PC plusSigned  1)
         onUpdateWrap(index + Y > 0xFF.ushort)
-        return ((bus.getData(index + 1.ubyte) shl 8) + bus.getData(index.ushort) + Y + ( if(SR and EFlag.CAR == 1.ubyte) 1 else 0).ushort).ushort
+        return ((bus.getData(index + 1.ubyte) shiftLeft 8) + bus.getData(index.ushort) + Y + ( if(SR and EFlag.CAR == 1.ubyte) 1 else 0).ushort).ushort
     }
     //endregion
 
@@ -158,7 +159,7 @@ class CPU(val bus: Bus) {
     private fun ASL(value: UByte): UByte {
         var value = value
         setFlag(EFlag.CAR, checkBit(value, 7))
-        value = value shl 1
+        value = (value shiftLeft 1).ubyte
         setFlag(EFlag.NEG, checkBit(value, 7))
         setFlag(EFlag.ZER, value == 0.ubyte)
         return value
@@ -278,7 +279,7 @@ class CPU(val bus: Bus) {
     private fun LSR(value: UByte): UByte {
         var value = value
         setFlag(EFlag.CAR, checkBit(value, 0))
-        value = value shr 1
+        value = (value shiftRight  1).ubyte
         setFlag(EFlag.ZER, value == 0.ubyte)
         return value
     }
@@ -293,8 +294,8 @@ class CPU(val bus: Bus) {
         var value = value
         val carrytemp = checkFlag(EFlag.CAR)
         setFlag(EFlag.CAR, checkBit(value, 7))
-        value = value shl 1
-        if (carrytemp) value++
+        value = (value shiftLeft 1).ubyte
+        if (carrytemp) value = (value + 1.uint).ubyte
         setFlag(EFlag.NEG, checkBit(value, 7))
         setFlag(EFlag.ZER, value == 0.ubyte)
         return value
@@ -304,8 +305,8 @@ class CPU(val bus: Bus) {
         var value = value
         val carrytemp = checkFlag(EFlag.CAR)
         setFlag(EFlag.CAR, checkBit(value, 0))
-        value = value shr 1
-        if (carrytemp) value = (value + (1 shl 7).ubyte).ubyte
+        value = (value shiftRight 1).ubyte
+        if (carrytemp) value = (value + (1.ubyte shiftLeft 7).ubyte).ubyte
         setFlag(EFlag.NEG, checkBit(value, 7))
         setFlag(EFlag.ZER, value == 0.ubyte)
         return value
@@ -314,7 +315,6 @@ class CPU(val bus: Bus) {
     private fun SBC(value: UByte) = ADC(value.inv())
     //endregion
 
-    //region Execution
     //region Execution
     fun exec() {
         if (!checkFlag(EFlag.IRQ) && IRQ)
@@ -335,7 +335,7 @@ class CPU(val bus: Bus) {
                     pushToStack(SR)
                     setFlag(EFlag.BRK, true)
                     setFlag(EFlag.IRQ, true)
-                    PC = ((bus.getData(0xFFFF.ushort) shl 8) + bus.getData(0xFFFE.ushort)).ushort
+                    PC = ((bus.getData(0xFFFF.ushort) shiftLeft 8) + bus.getData(0xFFFE.ushort)).ushort
                 }
                 0x01 -> {  //ORA   (indirect, X)
                     cycles = 6
@@ -525,7 +525,7 @@ class CPU(val bus: Bus) {
                 0x40 -> {  //RTI
                     cycles = 6
                     SR = pullFromStack()
-                    PC = (pullFromStack() + (pullFromStack() shl 8)).ushort
+                    PC = (pullFromStack() + (pullFromStack() shiftLeft 8)).ushort
                 }
                 0x41 -> {  //EOR   (indirect, Y)
                     EOR(bus.getData(getIndYAddr({ wrap = it })))
@@ -618,7 +618,7 @@ class CPU(val bus: Bus) {
                 }
                 0x60 -> {  //RTS
                     cycles = 6
-                    PC = (pullFromStack() + (pullFromStack() shl 8)).ushort
+                    PC = (pullFromStack() + (pullFromStack() shiftLeft 8)).ushort
                     PC = PC plusSigned 1
                 }
                 0x61 -> {  //ADC   (indirect, X)
@@ -654,7 +654,7 @@ class CPU(val bus: Bus) {
                     PC = PC plusSigned 1
                 }
                 0x6C -> {  //JMP   (indirect)
-                    PC = ((bus.getData(getAbsAddr()) shl 8) + bus.getData(getAbsAddr() plusSigned 1)).ushort
+                    PC = ((bus.getData(getAbsAddr()) shiftLeft 8) + bus.getData(getAbsAddr() plusSigned 1)).ushort
                     cycles = 5
                 }
                 0x6D -> {  //ADC   (absolute)

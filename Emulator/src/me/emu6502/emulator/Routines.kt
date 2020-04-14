@@ -39,5 +39,17 @@ class Routines {
             """.trimIndent().replace('€', '$'))
         }
 
+        val testRoutine by lazy {
+            Assembler.assemble("""
+                LDA #€50
+                STA €00
+                LDA #€3C
+                STA €01
+                LDA #€FF
+                STA €02
+                JSR €F000
+            """.trimIndent().replace('€', '$'))
+        }
+
     }
 }

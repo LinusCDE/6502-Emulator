@@ -36,11 +36,14 @@ val UShort.int
 val UByte.int
     get() = this.toInt()
 
-infix fun UByte.shl(bits: Int) = this.int.shl(bits).ubyte
-infix fun UByte.shr(bits: Int) = this.int.shr(bits).ubyte
+infix fun UByte.shiftLeft(bits: Int): UInt = this.int.shl(bits).uint
+infix fun UByte.shiftRight(bits: Int): UInt = this.int.shr(bits).uint
 
-infix fun UShort.shl(bits: Int) = this.int.shl(bits).ushort
-infix fun UShort.shr(bits: Int) = this.int.shr(bits).ushort
+infix fun UShort.shiftLeft(bits: Int): UInt = this.int.shl(bits).uint
+infix fun UShort.shiftRight(bits: Int): UInt = this.int.shr(bits).uint
+
+infix fun UInt.shiftLeft(bits: Int): UInt = this.int.shl(bits).uint
+infix fun UInt.shiftRight(bits: Int): UInt = this.int.shr(bits).uint
 
 infix fun UInt.plusSigned(other: Int): UInt = this + other.uint
 infix fun UShort.plusSigned(other: Int): UShort = (this + other.ushort).ushort

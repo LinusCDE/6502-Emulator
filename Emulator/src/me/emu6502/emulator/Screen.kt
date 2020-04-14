@@ -4,9 +4,13 @@ import me.emu6502.lib6502.Device
 import plusSigned
 import ubyte
 import java.awt.Color
+import kotlin.system.exitProcess
 
 open class Screen(width: Int, height: Int, startAddress: UShort): Device(startAddress, startAddress plusSigned 3) {
 
+    init {
+        memory[3] = 0x01.ubyte
+    }
     val bitmapScreen = DirectBitmap(width, height)
 
     override fun getData(address: UShort) = if(request(address) && (address == end)) memory[3] else 0x00.ubyte
@@ -19,7 +23,8 @@ open class Screen(width: Int, height: Int, startAddress: UShort): Device(startAd
     override fun performClockAction() {
         if(memory[3] == 0x02.ubyte) {
             // Also setting red value in case alpha is not displayed
-            bitmapScreen[memory[0].toInt(), memory[1].toInt()] = Color(memory[2].toInt(), 255, 255, memory[2].toInt())
+            val v = memory[2].toInt()
+            bitmapScreen[memory[0].toInt(), memory[1].toInt()] = Color(v, v, v)
             memory[3] = 0x01.ubyte
         }
     }

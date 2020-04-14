@@ -175,17 +175,17 @@ class Disassembler {
         fun hexStringToByte(stringbyte: String): UByte = Integer.parseUnsignedInt(stringbyte, 16).ubyte
 
         //region Code Strings
-        private fun zeropageCode(mnemonic: String, address: UByte) = "$mnemonic ${address.toString("X2")}";
+        private fun zeropageCode(mnemonic: String, address: UByte) = "$mnemonic \$${address.toString("X2")}";
         private fun zeropageXCode(mnemonic: String, address: UByte) = "${zeropageCode(mnemonic, address)}, X";
         private fun zeropageYCode(mnemonic: String, address: UByte) = "${zeropageCode(mnemonic, address)}, Y";
-        private fun absCode(mnemonic: String, low: UByte, high: UByte) = "$mnemonic ${high.toString("X2")}${low.toString("X2")}";
+        private fun absCode(mnemonic: String, low: UByte, high: UByte) = "$mnemonic \$${high.toString("X2")}${low.toString("X2")}";
         private fun absXCode(mnemonic: String, low: UByte, high: UByte) = "${absCode(mnemonic, low, high)}, X";
         private fun absYCode(mnemonic: String, low: UByte, high: UByte) = "${absCode(mnemonic, low, high)}, Y";
-        private fun immediateCode(mnemonic: String, value: UByte) = "$mnemonic #${value.toString("X2")}";
-        private fun indirectCode(mnemonic: String, low: UByte, high: UByte) = "$mnemonic (${high.toString("X2")}${low.toString("X2")})";
-        private fun indirectXCode(mnemonic: String, address: UByte) = "$mnemonic (${address.toString("X2")}, X)";
-        private fun indirectYCode(mnemonic: String, address: UByte) = "$mnemonic (${address.toString("X2")}), Y";
-        private fun relativeCode(mnemonic: String, value: UByte) = "$mnemonic ${value.toString("X2")}";
+        private fun immediateCode(mnemonic: String, value: UByte) = "$mnemonic #\$${value.toString("X2")}";
+        private fun indirectCode(mnemonic: String, low: UByte, high: UByte) = "$mnemonic (\$${high.toString("X2")}${low.toString("X2")})";
+        private fun indirectXCode(mnemonic: String, address: UByte) = "$mnemonic (\$${address.toString("X2")}, X)";
+        private fun indirectYCode(mnemonic: String, address: UByte) = "$mnemonic (\$${address.toString("X2")}), Y";
+        private fun relativeCode(mnemonic: String, value: UByte) = "$mnemonic \$${value.toString("X2")}";
         //endregion
     }
 }

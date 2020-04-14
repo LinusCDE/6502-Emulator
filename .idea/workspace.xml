@@ -9,7 +9,13 @@
     <list default="true" id="ba504d93-14cf-40bb-b01d-26a827049c43" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Emulator/src/me/emu6502/emulator/Emulator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Emulator/src/me/emu6502/emulator/Emulator.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Emulator/src/me/emu6502/emulator/Routines.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Emulator/src/me/emu6502/emulator/Routines.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Emulator/src/me/emu6502/emulator/Screen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Emulator/src/me/emu6502/emulator/Screen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KotlinUtils/src/me.emu6502.kotlinutils/BitConverter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/KotlinUtils/src/me.emu6502.kotlinutils/BitConverter.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KotlinUtils/src/me.emu6502.kotlinutils/DatatypeConversion.kt" beforeDir="false" afterPath="$PROJECT_DIR$/KotlinUtils/src/me.emu6502.kotlinutils/DatatypeConversion.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/CPU.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/CPU.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/Disassembler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/Disassembler.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/EFlag.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Lib6502/src/me/emu6502/lib6502/EFlag.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -108,7 +114,7 @@
       <updated>1586700108410</updated>
       <workItem from="1586700109515" duration="697000" />
       <workItem from="1586700827783" duration="23026000" />
-      <workItem from="1586774431756" duration="37136000" />
+      <workItem from="1586774431756" duration="46779000" />
     </task>
     <servers />
   </component>
@@ -161,22 +167,42 @@
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
     <state x="773" y="184" key="#org.jetbrains.kotlin.idea.refactoring.move.moveDeclarations.ui.MoveKotlinTopLevelDeclarationsDialog/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586799200748" />
-    <state width="1796" height="318" key="GridCell.Tab.0.bottom" timestamp="1586812976776">
+    <state x="762" y="287" key="#xdebugger.evaluate" timestamp="1586823068251">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state width="1796" height="318" key="GridCell.Tab.0.bottom/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586812976776" />
-    <state width="1796" height="318" key="GridCell.Tab.0.center" timestamp="1586812976776">
+    <state x="762" y="287" key="#xdebugger.evaluate/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586823068251" />
+    <state width="1796" height="318" key="GridCell.Tab.0.bottom" timestamp="1586823234547">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state width="1796" height="318" key="GridCell.Tab.0.center/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586812976776" />
-    <state width="1796" height="318" key="GridCell.Tab.0.left" timestamp="1586812976776">
+    <state width="1796" height="318" key="GridCell.Tab.0.bottom/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586823234547" />
+    <state width="1796" height="318" key="GridCell.Tab.0.center" timestamp="1586823234547">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state width="1796" height="318" key="GridCell.Tab.0.left/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586812976776" />
-    <state width="1796" height="318" key="GridCell.Tab.0.right" timestamp="1586812976776">
+    <state width="1796" height="318" key="GridCell.Tab.0.center/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586823234547" />
+    <state width="1796" height="318" key="GridCell.Tab.0.left" timestamp="1586823234547">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state width="1796" height="318" key="GridCell.Tab.0.right/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586812976776" />
+    <state width="1796" height="318" key="GridCell.Tab.0.left/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586823234547" />
+    <state width="1796" height="318" key="GridCell.Tab.0.right" timestamp="1586823234547">
+      <screen x="78" y="0" width="1842" height="1080" />
+    </state>
+    <state width="1796" height="318" key="GridCell.Tab.0.right/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586823234547" />
+    <state width="1796" height="356" key="GridCell.Tab.1.bottom" timestamp="1586823093958">
+      <screen x="78" y="0" width="1842" height="1080" />
+    </state>
+    <state width="1796" height="356" key="GridCell.Tab.1.bottom/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586823093958" />
+    <state width="1796" height="356" key="GridCell.Tab.1.center" timestamp="1586823093958">
+      <screen x="78" y="0" width="1842" height="1080" />
+    </state>
+    <state width="1796" height="356" key="GridCell.Tab.1.center/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586823093958" />
+    <state width="1796" height="356" key="GridCell.Tab.1.left" timestamp="1586823093958">
+      <screen x="78" y="0" width="1842" height="1080" />
+    </state>
+    <state width="1796" height="356" key="GridCell.Tab.1.left/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586823093958" />
+    <state width="1796" height="356" key="GridCell.Tab.1.right" timestamp="1586823093958">
+      <screen x="78" y="0" width="1842" height="1080" />
+    </state>
+    <state width="1796" height="356" key="GridCell.Tab.1.right/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586823093958" />
     <state x="2207" y="48" width="1024" height="844" key="SettingsEditor" timestamp="1586812517458">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
