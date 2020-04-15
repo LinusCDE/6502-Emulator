@@ -50,7 +50,7 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <dependency>
         <groupId>org.openjfx</groupId>
-        <artifactId>javafx</artifactId>
+        <artifactId>javafx-fxml</artifactId>
         <version>${javafx.version}</version>
     </dependency>
 
