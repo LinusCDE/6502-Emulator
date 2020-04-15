@@ -5,21 +5,16 @@ import me.emu6502.lib6502.CPU
 import me.emu6502.lib6502.RAM
 import me.emu6502.lib6502.ROM
 import plusSigned
-import toUByteArray
 import ubyte
 import ushort
-import java.io.File
 import toString
 import uint
 import java.lang.Exception
 import kotlin.system.exitProcess
 
-class Emulator {
-    companion object {
-        @JvmStatic fun main(args: Array<out String>) {
-            Emulator()
-        }
-    }
+class Emulator(val requestCommand: () -> String, val requestRawInput: () -> String, val requestAnyAction: () -> Unit,
+               val clear: () -> Unit, val write: (String) -> Unit, val writeLine: (String) -> Unit,
+               val updateScreen: (Screen) -> Unit, val defineCommand: (name: String, displayName: String, desc: String) -> Unit) {
 
     lateinit var cpu: CPU
     lateinit var mainbus: Bus
@@ -59,6 +54,8 @@ class Emulator {
         mainbus.devices.add(textscreen)*/
 
         cpu = CPU(mainbus).apply { PC = 0x0200.ushort }
+
+        updateScreen(screen)
     }
 
     private fun setUShortOrComplain(cmdArgs: List<String>, callback: ((value: UShort) -> Unit)) {
@@ -66,8 +63,8 @@ class Emulator {
             callback(cmdArgs[0].toInt(16).ushort)
         }catch (e: Exception) {
             // Number not parsable or argument missing
-            Console.writeLine("Fehlerhafte Eingabe!")
-            Console.readKey()
+            writeLine("Fehlerhafte Eingabe!")
+            requestAnyAction()
         }
     }
 
@@ -76,31 +73,31 @@ class Emulator {
             callback(cmdArgs[0].toInt(16).ubyte)
         }catch (e: Exception) {
             // Number not parsable or argument missing
-            Console.writeLine("Fehlerhafte Eingabe!")
-            Console.readKey()
+            writeLine("Fehlerhafte Eingabe!")
+            requestAnyAction()
         }
     }
 
     init {
         // Console setup
-        Console.resizeMac(140, 40)
+        //Console.resizeMac(140, 40)
         //Console.SetWindowSize(140, 43)
-        Console.completer.addCommand("q", "q", "Quit")
-        Console.completer.addCommand("ra", "ra", "Reset all")
-        Console.completer.addCommand("rc", "rc", "Reset CPU")
-        Console.completer.addCommand("a", "a", "Set register A")
-        Console.completer.addCommand("x", "x", "Set register X")
-        Console.completer.addCommand("y", "y", "Set register X")
-        Console.completer.addCommand("sr", "sr", "Set register StatusRegister")
-        Console.completer.addCommand("sp", "sp", "Set register StackPointer")
-        Console.completer.addCommand("pc", "pc", "Set register ProgramCounter")
-        Console.completer.addCommand("d", "d", "Set current page")
-        Console.completer.addCommand("m", "m", "Write custom data to memory address")
-        Console.completer.addCommand("", "<Enter>", "Step. Run single instruction and make screenshot")
-        Console.completer.addCommand("bl", "bl", "List breakpoints")
-        Console.completer.addCommand("ba", "ba", "Add breakpoint")
-        Console.completer.addCommand("br", "br", "Remove breakpoint")
-        Console.completer.addCommand("r", "r", "Run until breakpoint or end")
+        defineCommand("q", "q", "Quit")
+        defineCommand("ra", "ra", "Reset all")
+        defineCommand("rc", "rc", "Reset CPU")
+        defineCommand("a", "a", "Set register A")
+        defineCommand("x", "x", "Set register X")
+        defineCommand("y", "y", "Set register X")
+        defineCommand("sr", "sr", "Set register StatusRegister")
+        defineCommand("sp", "sp", "Set register StackPointer")
+        defineCommand("pc", "pc", "Set register ProgramCounter")
+        defineCommand("d", "d", "Set current page")
+        defineCommand("m", "m", "Write custom data to memory address")
+        defineCommand("", "<Enter>", "Step. Run single instruction")
+        defineCommand("bl", "bl", "List breakpoints")
+        defineCommand("ba", "ba", "Add breakpoint")
+        defineCommand("br", "br", "Remove breakpoint")
+        defineCommand("r", "r", "Run until breakpoint or end")
 
         reset()
 
@@ -109,18 +106,18 @@ class Emulator {
 
         while (true)
         {
-            Console.clear()
-            Console.writeLine(cpu)
+            clear()
+            writeLine(cpu.toString())
             var line: Int = currentpage.toInt()
             while(line < if((currentpage + 0x0400.uint) > 65536.uint) 65536 else currentpage.toInt() + 0x0400) {
-                Console.write("$" + line.toString("X4") + ":")
+                write("$" + line.toString("X4") + ":")
                 for (pc in line until (line + 32))
-                    Console.write(" $" + mainbus.getData(pc.ushort).toString("X2"))
-                Console.writeLine()
+                    write(" $" + mainbus.getData(pc.ushort).toString("X2"))
+                writeLine("")
                 line += 32
             }
-            Console.writeLine()
-            val inputLine = Console.readLine("> ").trim()
+            writeLine("")
+            val inputLine = requestCommand().trim()
             val cmdArgs = if(' ' in inputLine) inputLine.split(' ').toMutableList() else arrayListOf(inputLine)
             if(cmdArgs.isEmpty())
                 continue
@@ -141,16 +138,14 @@ class Emulator {
                 "m" -> {
                     setUShortOrComplain(cmdArgs) { memoryAddress ->
 
-                        Console.completer.completionEnabled = false
-                        val line = Console.readLine()
-                        Console.completer.completionEnabled = true
+                        val line = requestRawInput()
 
                         val data: UByteArray
                         try {
                             data = line.split(' ').map { it.toInt().ubyte }.toUByteArray()
                         }catch (e: Exception) {
-                            Console.writeLine("Fehlerhafte Eingabe!")
-                            Console.readKey()
+                            writeLine("Fehlerhafte Eingabe!")
+                            requestAnyAction()
                             return@setUShortOrComplain
                         }
 
@@ -161,12 +156,12 @@ class Emulator {
                 "" -> {
                     cpu.step()
                     mainbus.performClockActions()
-                    screen.screenshot()
-                    //textscreen.screenshot() // TODO: Screenshot of textscreen overwrites screenshot of screen!
+                    updateScreen(screen)
+                    //textscreen.screenshot()
                 }
                 "bl" -> {
-                    Console.writeLine(breakpoints.map { it.toString("X4") }.joinToString(", "))
-                    Console.readKey()
+                    writeLine(breakpoints.map { it.toString("X4") }.joinToString(", "))
+                    requestAnyAction()
                 }
                 "ba" -> setUShortOrComplain(cmdArgs) { breakpoints.add(it) }
                 "br" -> setUShortOrComplain(cmdArgs) { breakpoints.remove(it) }
@@ -175,12 +170,12 @@ class Emulator {
                         cpu.step()
                         mainbus.performClockActions()
                     } while (!breakpoints.contains(cpu.PC) && mainbus.getData(cpu.PC) != 0x00.ubyte)
-                    screen.screenshot()
-                    //textscreen.screenshot() // TODO: Screenshot of textscreen overwrites screenshot of screen!
+                    updateScreen(screen)
+                    //textscreen.screenshot()
                 }
                 else -> {
-                    Console.writeLine("Unbekannter befehl! Drücke Tab für eine übersicht der Befehle.")
-                    Console.readKey()
+                    writeLine("Unbekannter befehl! Drücke Tab für eine übersicht der Befehle.")
+                    requestAnyAction()
                 }
             }
 

@@ -24,5 +24,6 @@
     <orderEntry type="module" module-name="KotlinUtils" />
     <orderEntry type="library" name="org.jline:jline:3.9.0" level="project" />
     <orderEntry type="library" name="org.jline:jline-reader:3.14.1" level="project" />
+    <orderEntry type="library" name="no.tornado:tornadofx:1.7.20" level="project" />
   </component>
 </module>
