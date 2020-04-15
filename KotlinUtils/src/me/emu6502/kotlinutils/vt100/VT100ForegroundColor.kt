@@ -1,4 +1,4 @@
-package vt100
+package me.emu6502.kotlinutils.vt100
 
 enum class VT100ForegroundColor: VT100Attribute {
 

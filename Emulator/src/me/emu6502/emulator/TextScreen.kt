@@ -1,6 +1,6 @@
 package me.emu6502.emulator
 
-import UByteArray2D
+import me.emu6502.kotlinutils.*
 import java.io.DataInputStream
 import java.io.FileInputStream
 

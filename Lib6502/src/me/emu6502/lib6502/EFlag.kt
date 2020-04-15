@@ -1,6 +1,6 @@
 package me.emu6502.lib6502
 
-import ubyte
+import me.emu6502.kotlinutils.*
 
 class EFlag {
     companion object {

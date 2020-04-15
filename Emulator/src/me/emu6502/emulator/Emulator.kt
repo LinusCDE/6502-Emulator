@@ -4,11 +4,7 @@ import me.emu6502.lib6502.Bus
 import me.emu6502.lib6502.CPU
 import me.emu6502.lib6502.RAM
 import me.emu6502.lib6502.ROM
-import plusSigned
-import ubyte
-import ushort
-import toString
-import uint
+import me.emu6502.kotlinutils.*
 import java.lang.Exception
 import kotlin.system.exitProcess
 

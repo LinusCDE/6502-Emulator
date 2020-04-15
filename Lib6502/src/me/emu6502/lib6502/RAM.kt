@@ -1,9 +1,6 @@
 package me.emu6502.lib6502
 
-import int
-import minusSigned
-import ubyte
-import ushort
+import me.emu6502.kotlinutils.*
 
 class RAM(size: UShort, start: UShort): Device(start, (start + size minusSigned 1).ushort) {
 

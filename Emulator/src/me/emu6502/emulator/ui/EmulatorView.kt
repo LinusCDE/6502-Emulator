@@ -4,12 +4,9 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
-import javafx.collections.ObservableList
 import javafx.geometry.Pos
-import javafx.scene.CacheHint
 import javafx.scene.Parent
 import javafx.scene.image.Image
-import org.jline.reader.Candidate
 import tornadofx.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock

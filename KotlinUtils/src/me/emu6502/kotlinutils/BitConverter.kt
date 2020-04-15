@@ -1,3 +1,5 @@
+package me.emu6502.kotlinutils
+
 class BitConverter  {
     companion object {
         fun IsLittleEndian() = true

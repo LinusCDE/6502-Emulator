@@ -5,7 +5,6 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.embed.swing.SwingFXUtils
 import javafx.scene.control.Alert
 import javafx.scene.control.ButtonType
-import me.emu6502.emulator.Console
 import me.emu6502.emulator.Emulator
 import tornadofx.*
 import java.util.concurrent.locks.ReentrantLock

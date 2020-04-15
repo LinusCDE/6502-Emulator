@@ -1,3 +1,5 @@
+package me.emu6502.kotlinutils
+
 class UByteArray2D(val width: Int, val height: Int) {
 
     val bytes = UByteArray(width * height)

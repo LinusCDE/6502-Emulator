@@ -1,7 +1,6 @@
 package me.emu6502.lib6502
 
-import ubyte
-import ushort
+import me.emu6502.kotlinutils.*
 import java.lang.NumberFormatException
 
 class Assembler {

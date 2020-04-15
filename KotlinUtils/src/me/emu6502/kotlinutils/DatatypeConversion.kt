@@ -1,3 +1,5 @@
+package me.emu6502.kotlinutils
+
 import java.lang.RuntimeException
 
 val UInt.ubyte

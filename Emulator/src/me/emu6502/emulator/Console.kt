@@ -1,11 +1,8 @@
 package me.emu6502.emulator
 
+import me.emu6502.kotlinutils.vt100.*
 import org.jline.reader.LineReaderBuilder
 import org.jline.terminal.TerminalBuilder
-import vt100.VT100Attribute
-import vt100.VT100BackgroundColor
-import vt100.VT100ForegroundColor
-import vt100.VT100Sequence
 
 /**
  * Good source when needing to add more functions:

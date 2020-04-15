@@ -1,13 +1,6 @@
 package me.emu6502.lib6502
 
-import BitConverter
-import plusSigned
-import shiftLeft
-import shiftRight
-import toString
-import ubyte
-import uint
-import ushort
+import me.emu6502.kotlinutils.*
 import kotlin.math.log2
 
 class CPU(val bus: Bus) {

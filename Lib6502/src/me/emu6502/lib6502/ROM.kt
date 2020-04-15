@@ -1,9 +1,6 @@
 package me.emu6502.lib6502
 
-import int
-import ushort
-import minusSigned
-import ubyte
+import me.emu6502.kotlinutils.*
 import java.lang.IllegalArgumentException
 
 class ROM(size: UShort, start: UShort): Device(start, (start + size minusSigned  1).ushort) {

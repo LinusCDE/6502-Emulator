@@ -1,7 +1,6 @@
 package me.emu6502.lib6502
 
-import toString
-import ubyte
+import me.emu6502.kotlinutils.*
 
 class Disassembler {
     companion object {
