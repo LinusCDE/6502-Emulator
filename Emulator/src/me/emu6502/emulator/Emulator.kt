@@ -124,6 +124,7 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
                         cmdArgs.removeAt(0)
                         val data = cmdArgs.joinToString("")
                                 .replace(" ", "")
+                                .replace("$", "")
                                 .chunked(2)
                                 .map { Integer.parseInt(it, 16).ubyte }
                                 .toUByteArray()
