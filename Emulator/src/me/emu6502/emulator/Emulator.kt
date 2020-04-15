@@ -164,7 +164,7 @@ class Emulator(val requestCommand: () -> String, val requestRawInput: () -> Stri
                     updateScreen(screen)
                     //textscreen.screenshot()
                 }
-                else -> reportError("Unbekannter befehl! Drücke Tab für eine übersicht der Befehle.")
+                else -> reportError("Unbekannter Befehl! Tabulatortaste für eine Befehlsübersicht drücken.")
             }
 
         }
