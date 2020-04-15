@@ -7,10 +7,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ba504d93-14cf-40bb-b01d-26a827049c43" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/Emulator_jar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/Emulator_jar.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Emulator/Emulator.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Emulator/Emulator.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Emulator/src/META-INF/MANIFEST.MF" beforeDir="false" afterPath="$PROJECT_DIR$/Emulator/src/META-INF/MANIFEST.MF" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Emulator/src/me/emu6502/emulator/Emulator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Emulator/src/me/emu6502/emulator/Emulator.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Emulator/src/me/emu6502/emulator/Main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Emulator/src/me/emu6502/emulator/Main.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Emulator/src/me/emu6502/emulator/ui/EmulatorController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Emulator/src/me/emu6502/emulator/ui/EmulatorController.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,6 +65,7 @@
     <property name="project.structure.last.edited" value="Artifacts" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
+    <property name="restartRequiresConfirmation" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="MoveKotlinTopLevelDeclarationsDialog.RECENTS_KEY">
@@ -82,7 +85,7 @@
     <configuration name="MainKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
       <module name="Emulator" />
       <option name="VM_PARAMETERS" value="" />
-      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="PROGRAM_PARAMETERS" value="--gui" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
       <option name="PASS_PARENT_ENVS" value="true" />
@@ -115,7 +118,7 @@
       <workItem from="1586896621525" duration="366000" />
       <workItem from="1586897330603" duration="259000" />
       <workItem from="1586898426487" duration="639000" />
-      <workItem from="1586910384425" duration="1430000" />
+      <workItem from="1586910384425" duration="8515000" />
     </task>
     <servers />
   </component>
@@ -131,11 +134,11 @@
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
     <state x="599" y="202" width="800" height="672" key="#Project_Structure/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586776785820" />
-    <state x="457" y="198" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1586911761060">
+    <state x="457" y="198" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1586912051344">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
     <state x="2315" y="198" key="#com.intellij.execution.impl.EditConfigurationsDialog/78.0.1842.1080/1920.0.1920.1080@1920.0.1920.1080" timestamp="1586812481464" />
-    <state x="457" y="198" key="#com.intellij.execution.impl.EditConfigurationsDialog/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586911761060" />
+    <state x="457" y="198" key="#com.intellij.execution.impl.EditConfigurationsDialog/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586912051344" />
     <state x="794" y="261" key="#com.intellij.ide.util.MemberChooser" timestamp="1586802157471">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
@@ -160,10 +163,10 @@
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
     <state x="488" y="0" width="881" height="925" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586801037919" />
-    <state x="736" y="300" key="#com.intellij.util.ui.classpath.ChooseLibrariesDialog" timestamp="1586910475378">
+    <state x="736" y="300" key="#com.intellij.util.ui.classpath.ChooseLibrariesDialog" timestamp="1586913132152">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state x="736" y="300" key="#com.intellij.util.ui.classpath.ChooseLibrariesDialog/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586910475378" />
+    <state x="736" y="300" key="#com.intellij.util.ui.classpath.ChooseLibrariesDialog/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586913132152" />
     <state x="773" y="184" key="#org.jetbrains.kotlin.idea.refactoring.move.moveDeclarations.ui.MoveKotlinTopLevelDeclarationsDialog" timestamp="1586911716055">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
@@ -172,26 +175,26 @@
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
     <state x="762" y="287" key="#xdebugger.evaluate/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586823068251" />
-    <state x="780" y="278" width="424" height="479" key="FileChooserDialogImpl" timestamp="1586898463558">
+    <state x="780" y="278" width="424" height="479" key="FileChooserDialogImpl" timestamp="1586913143186">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state x="780" y="278" width="424" height="479" key="FileChooserDialogImpl/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586898463558" />
-    <state width="1796" height="318" key="GridCell.Tab.0.bottom" timestamp="1586911790457">
+    <state x="780" y="278" width="424" height="479" key="FileChooserDialogImpl/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586913143186" />
+    <state width="1796" height="318" key="GridCell.Tab.0.bottom" timestamp="1586918864963">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state width="1796" height="318" key="GridCell.Tab.0.bottom/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586911790457" />
-    <state width="1796" height="318" key="GridCell.Tab.0.center" timestamp="1586911790457">
+    <state width="1796" height="318" key="GridCell.Tab.0.bottom/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586918864963" />
+    <state width="1796" height="318" key="GridCell.Tab.0.center" timestamp="1586918864963">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state width="1796" height="318" key="GridCell.Tab.0.center/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586911790457" />
-    <state width="1796" height="318" key="GridCell.Tab.0.left" timestamp="1586911790456">
+    <state width="1796" height="318" key="GridCell.Tab.0.center/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586918864963" />
+    <state width="1796" height="318" key="GridCell.Tab.0.left" timestamp="1586918864963">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state width="1796" height="318" key="GridCell.Tab.0.left/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586911790456" />
-    <state width="1796" height="318" key="GridCell.Tab.0.right" timestamp="1586911790457">
+    <state width="1796" height="318" key="GridCell.Tab.0.left/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586918864963" />
+    <state width="1796" height="318" key="GridCell.Tab.0.right" timestamp="1586918864963">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
-    <state width="1796" height="318" key="GridCell.Tab.0.right/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586911790457" />
+    <state width="1796" height="318" key="GridCell.Tab.0.right/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586918864963" />
     <state width="1796" height="356" key="GridCell.Tab.1.bottom" timestamp="1586824488974">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
@@ -208,11 +211,11 @@
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
     <state width="1796" height="356" key="GridCell.Tab.1.right/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586824488974" />
-    <state x="487" y="120" width="1024" height="844" key="SettingsEditor" timestamp="1586911747852">
+    <state x="487" y="120" width="1024" height="844" key="SettingsEditor" timestamp="1586913187344">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
     <state x="2207" y="48" width="1024" height="844" key="SettingsEditor/78.0.1842.1080/1920.0.1920.1080@1920.0.1920.1080" timestamp="1586812517458" />
-    <state x="487" y="120" width="1022" height="840" key="SettingsEditor/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586911747852" />
+    <state x="487" y="120" width="1022" height="840" key="SettingsEditor/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586913187344" />
     <state x="732" y="485" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1586910472639">
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
@@ -233,10 +236,10 @@
       <screen x="78" y="0" width="1842" height="1080" />
     </state>
     <state x="624" y="242" key="run.anything.popup/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586805967746" />
-    <state x="2529" y="239" width="701" height="678" key="search.everywhere.popup" timestamp="1586812894647">
-      <screen x="1920" y="0" width="1920" height="1080" />
+    <state x="662" y="239" width="672" height="678" key="search.everywhere.popup" timestamp="1586917358842">
+      <screen x="78" y="0" width="1842" height="1080" />
     </state>
     <state x="2529" y="239" width="701" height="678" key="search.everywhere.popup/78.0.1842.1080/1920.0.1920.1080@1920.0.1920.1080" timestamp="1586812894647" />
-    <state x="662" y="239" width="672" height="678" key="search.everywhere.popup/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586809207201" />
+    <state x="662" y="239" width="672" height="678" key="search.everywhere.popup/78.0.1842.1080/1920.0.1920.1080@78.0.1842.1080" timestamp="1586917358842" />
   </component>
 </project>

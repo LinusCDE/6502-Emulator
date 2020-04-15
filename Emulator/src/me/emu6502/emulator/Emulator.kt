@@ -12,7 +12,7 @@ import uint
 import java.lang.Exception
 import kotlin.system.exitProcess
 
-class Emulator(val requestCommand: () -> String, val requestRawInput: () -> String, val requestAnyAction: () -> Unit,
+class Emulator(val requestCommand: () -> String, val requestRawInput: () -> String, val reportError: (String) -> Unit,
                val clear: () -> Unit, val write: (String) -> Unit, val writeLine: (String) -> Unit,
                val updateScreen: (Screen) -> Unit, val defineCommand: (name: String, displayName: String, desc: String) -> Unit) {
 
@@ -62,9 +62,7 @@ class Emulator(val requestCommand: () -> String, val requestRawInput: () -> Stri
         try {
             callback(cmdArgs[0].toInt(16).ushort)
         }catch (e: Exception) {
-            // Number not parsable or argument missing
-            writeLine("Fehlerhafte Eingabe!")
-            requestAnyAction()
+            reportError("Fehlerhafte Eingabe!") // Number not parsable or argument missing
         }
     }
 
@@ -72,9 +70,7 @@ class Emulator(val requestCommand: () -> String, val requestRawInput: () -> Stri
         try {
             callback(cmdArgs[0].toInt(16).ubyte)
         }catch (e: Exception) {
-            // Number not parsable or argument missing
-            writeLine("Fehlerhafte Eingabe!")
-            requestAnyAction()
+            reportError("Fehlerhafte Eingabe!") // Number not parsable or argument missing
         }
     }
 
@@ -144,8 +140,7 @@ class Emulator(val requestCommand: () -> String, val requestRawInput: () -> Stri
                         try {
                             data = line.split(' ').map { it.toInt().ubyte }.toUByteArray()
                         }catch (e: Exception) {
-                            writeLine("Fehlerhafte Eingabe!")
-                            requestAnyAction()
+                            reportError("Fehlerhafte Eingabe!")
                             return@setUShortOrComplain
                         }
 
@@ -161,7 +156,7 @@ class Emulator(val requestCommand: () -> String, val requestRawInput: () -> Stri
                 }
                 "bl" -> {
                     writeLine(breakpoints.map { it.toString("X4") }.joinToString(", "))
-                    requestAnyAction()
+                    requestRawInput()
                 }
                 "ba" -> setUShortOrComplain(cmdArgs) { breakpoints.add(it) }
                 "br" -> setUShortOrComplain(cmdArgs) { breakpoints.remove(it) }
@@ -173,10 +168,7 @@ class Emulator(val requestCommand: () -> String, val requestRawInput: () -> Stri
                     updateScreen(screen)
                     //textscreen.screenshot()
                 }
-                else -> {
-                    writeLine("Unbekannter befehl! Drücke Tab für eine übersicht der Befehle.")
-                    requestAnyAction()
-                }
+                else -> reportError("Unbekannter befehl! Drücke Tab für eine übersicht der Befehle.")
             }
 
         }
