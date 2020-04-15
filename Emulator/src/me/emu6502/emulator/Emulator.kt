@@ -6,11 +6,12 @@ import me.emu6502.lib6502.RAM
 import me.emu6502.lib6502.ROM
 import me.emu6502.kotlinutils.*
 import java.lang.Exception
+import java.lang.NumberFormatException
 import kotlin.system.exitProcess
 
-class Emulator(val requestCommand: () -> String, val requestRawInput: () -> String, val reportError: (String) -> Unit,
+class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> Unit,
                val clear: () -> Unit, val write: (String) -> Unit, val writeLine: (String) -> Unit,
-               val updateScreen: (Screen) -> Unit, val defineCommand: (name: String, displayName: String, desc: String) -> Unit) {
+               val defineCommand: (name: String, displayName: String, desc: String) -> Unit) {
 
     lateinit var cpu: CPU
     lateinit var mainbus: Bus
@@ -19,6 +20,9 @@ class Emulator(val requestCommand: () -> String, val requestRawInput: () -> Stri
     lateinit var screen: Screen
     lateinit var charrom: ROM
     lateinit var textscreen: TextScreen
+
+    val breakpoints = arrayListOf<UShort>()
+    var currentpage: UShort = 0.ushort
 
     fun reset() {
 
@@ -54,19 +58,99 @@ class Emulator(val requestCommand: () -> String, val requestRawInput: () -> Stri
         updateScreen(screen)
     }
 
-    private fun setUShortOrComplain(cmdArgs: List<String>, callback: ((value: UShort) -> Unit)) {
+    private fun setUShortOrComplain(cmdArgs: List<String>, usage: String = "", callback: ((value: UShort) -> Unit)) {
+        var value: UShort
         try {
-            callback(cmdArgs[0].toInt(16).ushort)
+            value = cmdArgs[0].toInt(16).ushort
         }catch (e: Exception) {
-            reportError("Fehlerhafte Eingabe!") // Number not parsable or argument missing
+            // Number not parsable or argument missing
+            reportError("Fehlerhafte Eingabe!${if(usage != "") "\nUsage: $usage" else ""}")
+            return
         }
+        callback(value)
     }
 
-    private fun setUByteOrComplain(cmdArgs: List<String>, callback: ((value: UByte) -> Unit)) {
+    private fun setUByteOrComplain(cmdArgs: List<String>, usage: String = "", callback: ((value: UByte) -> Unit)) {
+        var value: UByte
         try {
-            callback(cmdArgs[0].toInt(16).ubyte)
+            value = cmdArgs[0].toInt(16).ubyte
         }catch (e: Exception) {
-            reportError("Fehlerhafte Eingabe!") // Number not parsable or argument missing
+            // Number not parsable or argument missing
+            reportError("Fehlerhafte Eingabe!${if(usage != "") "\nUsage: $usage" else ""}")
+            return
+        }
+        callback(value)
+    }
+
+    fun printStatus(currentPage: UShort = this.currentpage) {
+        clear()
+        writeLine(cpu.toString())
+        var line: Int = currentpage.toInt()
+        while(line < if((currentpage + 0x0400.uint) > 65536.uint) 65536 else currentpage.toInt() + 0x0400) {
+            write("$" + line.toString("X4") + ":")
+            for (pc in line until (line + 32))
+                write(" $" + mainbus.getData(pc.ushort).toString("X2"))
+            writeLine("")
+            line += 32
+        }
+        writeLine("")
+    }
+
+    fun executeDebuggerCommand(commandLine: String) {
+        printStatus()
+
+        val cmdArgs = if(' ' in commandLine) commandLine.split(' ').toMutableList() else arrayListOf(commandLine)
+        if(cmdArgs.isEmpty())
+            return
+        val cmdName = cmdArgs.removeAt(0).toLowerCase()
+
+        when (cmdName)
+        {
+            "q" -> exitProcess(0)
+            "ra" -> reset()
+            "rc" -> cpu.reset()
+            "a" -> setUByteOrComplain(cmdArgs, "a <Byte_in_Hex>") { cpu.A = it }
+            "x" -> setUByteOrComplain(cmdArgs, "x <Byte_in_Hex>") { cpu.X = it }
+            "y" -> setUByteOrComplain(cmdArgs, "y <Byte_in_Hex>") { cpu.Y = it }
+            "sr" -> setUByteOrComplain(cmdArgs, "sr <Byte_in_Hex>") { cpu.SR = it }
+            "sp" -> setUByteOrComplain(cmdArgs, "sp <Byte_in_Hex>") { cpu.SP = it }
+            "pc" -> setUShortOrComplain(cmdArgs, "pc <Byte_in_Hex>") { cpu.PC = it }
+            "d" -> setUShortOrComplain(cmdArgs, "d <Address_in_Hex>") { currentpage = it }
+            "m" -> {
+                if(cmdArgs.size < 2) {
+                    reportError("Fehlerhafte Eingabe!\nUsage: m <Address_in_Hex> <Bytes_in_Hex> ...")
+                }else {
+                    setUShortOrComplain(cmdArgs, "m <Address_in_Hex> <Bytes_in_Hex> ...") { memoryAddress ->
+                        cmdArgs.removeAt(0)
+                        val data = cmdArgs.joinToString("")
+                                .replace(" ", "")
+                                .chunked(2)
+                                .map { Integer.parseInt(it, 16).ubyte }
+                                .toUByteArray()
+
+                        for (mem in data.indices)
+                            ram.setData(data[mem], memoryAddress plusSigned mem)
+                    }
+                }
+            }
+            "" -> {
+                cpu.step()
+                mainbus.performClockActions()
+                updateScreen(screen)
+                //textscreen.screenshot()
+            }
+            "bl" -> writeLine(breakpoints.map { it.toString("X4") }.joinToString(", "))
+            "ba" -> setUShortOrComplain(cmdArgs) { breakpoints.add(it) }
+            "br" -> setUShortOrComplain(cmdArgs) { breakpoints.remove(it) }
+            "r" -> {
+                do {
+                    cpu.step()
+                    mainbus.performClockActions()
+                } while (!breakpoints.contains(cpu.PC) && mainbus.getData(cpu.PC) != 0x00.ubyte)
+                updateScreen(screen)
+                //textscreen.screenshot()
+            }
+            else -> reportError("Unbekannter Befehl! Tabulatortaste für eine Befehlsübersicht drücken.")
         }
     }
 
@@ -74,6 +158,7 @@ class Emulator(val requestCommand: () -> String, val requestRawInput: () -> Stri
         // Console setup
         //Console.resizeMac(140, 40)
         //Console.SetWindowSize(140, 43)
+
         defineCommand("q", "q", "Quit")
         defineCommand("ra", "ra", "Reset all")
         defineCommand("rc", "rc", "Reset CPU")
@@ -92,81 +177,5 @@ class Emulator(val requestCommand: () -> String, val requestRawInput: () -> Stri
         defineCommand("r", "r", "Run until breakpoint or end")
 
         reset()
-
-        var currentpage: UShort = 0x0000.ushort
-        val breakpoints = arrayListOf<UShort>()
-
-        while (true)
-        {
-            clear()
-            writeLine(cpu.toString())
-            var line: Int = currentpage.toInt()
-            while(line < if((currentpage + 0x0400.uint) > 65536.uint) 65536 else currentpage.toInt() + 0x0400) {
-                write("$" + line.toString("X4") + ":")
-                for (pc in line until (line + 32))
-                    write(" $" + mainbus.getData(pc.ushort).toString("X2"))
-                writeLine("")
-                line += 32
-            }
-            writeLine("")
-            val inputLine = requestCommand().trim()
-            val cmdArgs = if(' ' in inputLine) inputLine.split(' ').toMutableList() else arrayListOf(inputLine)
-            if(cmdArgs.isEmpty())
-                continue
-            val cmdName = cmdArgs.removeAt(0).toLowerCase()
-
-            when (cmdName)
-            {
-                "q" -> exitProcess(0)
-                "ra" -> reset()
-                "rc" -> cpu.reset()
-                "a" -> setUByteOrComplain(cmdArgs) { cpu.A = it }
-                "x" -> setUByteOrComplain(cmdArgs) { cpu.X = it }
-                "y" -> setUByteOrComplain(cmdArgs) { cpu.Y = it }
-                "sr" -> setUByteOrComplain(cmdArgs) { cpu.SR = it }
-                "sp" -> setUByteOrComplain(cmdArgs) { cpu.SP = it }
-                "pc" -> setUShortOrComplain(cmdArgs) { cpu.PC = it }
-                "d" -> setUShortOrComplain(cmdArgs) { currentpage = it }
-                "m" -> {
-                    setUShortOrComplain(cmdArgs) { memoryAddress ->
-
-                        val line = requestRawInput()
-
-                        val data: UByteArray
-                        try {
-                            data = line.split(' ').map { it.toInt().ubyte }.toUByteArray()
-                        }catch (e: Exception) {
-                            reportError("Fehlerhafte Eingabe!")
-                            return@setUShortOrComplain
-                        }
-
-                        for(mem in data.indices)
-                            ram.setData(data[mem], memoryAddress plusSigned mem)
-                    }
-                }
-                "" -> {
-                    cpu.step()
-                    mainbus.performClockActions()
-                    updateScreen(screen)
-                    //textscreen.screenshot()
-                }
-                "bl" -> {
-                    writeLine(breakpoints.map { it.toString("X4") }.joinToString(", "))
-                    requestRawInput()
-                }
-                "ba" -> setUShortOrComplain(cmdArgs) { breakpoints.add(it) }
-                "br" -> setUShortOrComplain(cmdArgs) { breakpoints.remove(it) }
-                "r" -> {
-                    do {
-                        cpu.step()
-                        mainbus.performClockActions()
-                    } while (!breakpoints.contains(cpu.PC) && mainbus.getData(cpu.PC) != 0x00.ubyte)
-                    updateScreen(screen)
-                    //textscreen.screenshot()
-                }
-                else -> reportError("Unbekannter Befehl! Tabulatortaste für eine Befehlsübersicht drücken.")
-            }
-
-        }
     }
 }
