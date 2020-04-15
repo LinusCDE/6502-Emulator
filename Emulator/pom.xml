@@ -14,6 +14,7 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
   
   <properties>
     <main.class>me.emu6502.emulator.MainKt</main.class>
+    <javafx.version>15-ea+3</javafx.version>
   </properties>
   
   
@@ -46,7 +47,37 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
       <artifactId>jline-reader</artifactId>
       <version>3.14.1</version>
     </dependency>
-    
+
+    <dependency>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-fxml</artifactId>
+        <version>${javafx.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-swing</artifactId>
+        <version>${javafx.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-controls</artifactId>
+        <version>${javafx.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-graphics</artifactId>
+        <version>${javafx.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-web</artifactId>
+        <version>${javafx.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>no.tornado</groupId>
       <artifactId>tornadofx</artifactId>
