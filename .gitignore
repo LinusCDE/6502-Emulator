@@ -3,3 +3,7 @@
 **.bin
 **.bmp
 **.png
+
+**/target/
+**/.idea
+**.iml
