@@ -28,9 +28,14 @@ jobs:
         java-version: 11
     
     - run: mvn clean package -e
-    
+      
+    - name: Prepare artifact
+      run: |
+        mkdir dist/
+        cp Emulator/target/emulator-*-jar-with-dependencies.jar dist/
+   
     - name: Upload artifact
       uses: actions/upload-artifact@v1
       with:
         name: 6502-Emulator
-        path: Emulator/target/emulator-*-jar-with-dependencies.jar
+        path: dist/
