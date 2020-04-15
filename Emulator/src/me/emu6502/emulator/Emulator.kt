@@ -79,7 +79,7 @@ class Emulator(val requestCommand: () -> String, val requestRawInput: () -> Stri
         defineCommand("rc", "rc", "Reset CPU")
         defineCommand("a", "a", "Set register A")
         defineCommand("x", "x", "Set register X")
-        defineCommand("y", "y", "Set register X")
+        defineCommand("y", "y", "Set register Y")
         defineCommand("sr", "sr", "Set register StatusRegister")
         defineCommand("sp", "sp", "Set register StackPointer")
         defineCommand("pc", "pc", "Set register ProgramCounter")
@@ -164,7 +164,7 @@ class Emulator(val requestCommand: () -> String, val requestRawInput: () -> Stri
                     updateScreen(screen)
                     //textscreen.screenshot()
                 }
-                else -> reportError("Unbekannter befehl! Drücke Tab für eine übersicht der Befehle.")
+                else -> reportError("Unbekannter Befehl! Tabulatortaste für eine Befehlsübersicht drücken.")
             }
 
         }
