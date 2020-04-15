@@ -22,6 +22,7 @@ class EmulatorWindow: View() {
     val controller: EmulatorController by inject()
 
     override val root: Parent = hbox {
+        add(find<AssemblerView>())
         add(find<EmulatorConsoleView>())
         vbox {
             label("Screen:")
@@ -48,9 +49,10 @@ class EmulatorConsoleView: View() {
         isEditable = false
         isWrapText = true
         style {
-            prefColumnCount = 134
+            prefColumnCount = 140
             prefRowCount = 38
             fontFamily = "monospaced"
+            //fontSize = Dimension(9.0, Dimension.LinearUnits.pt)
         }
     }
 
@@ -73,4 +75,34 @@ class EmulatorConsoleView: View() {
         }
     }
 
+}
+
+class AssemblerView: View() {
+    val controller: AssemblerController by inject()
+
+    override val root: Parent = borderpane {
+        top = borderpane {
+            left = hbox {
+                alignment = Pos.CENTER_LEFT
+                label("Ziel-Adresse: ")
+                textfield(controller.memoryAddressProperty) {
+                    style {
+                        fontFamily = "monospaced"
+                        prefColumnCount = 5
+                    }
+                }
+            }
+            right = button("Assemble") {
+                action { controller.onAssembleButtonPressed() }
+            }
+        }
+        center = textarea(controller.sourceCodeProperty) {
+            style {
+                prefColumnCount = 30
+                isWrapText = false
+                fontFamily = "monospaced"
+            }
+        }
+        bottom = label(controller.statusMessageProperty)
+    }
 }

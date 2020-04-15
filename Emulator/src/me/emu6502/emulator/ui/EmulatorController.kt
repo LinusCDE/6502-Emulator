@@ -10,7 +10,13 @@ import javafx.scene.control.Alert
 import javafx.scene.control.ButtonType
 import javafx.scene.image.Image
 import me.emu6502.emulator.Emulator
+import me.emu6502.kotlinutils.ubyte
+import me.emu6502.kotlinutils.ushort
+import me.emu6502.lib6502.AssembleException
+import me.emu6502.lib6502.Assembler
+import me.emu6502.lib6502.EmulationException
 import tornadofx.*
+import java.lang.Exception
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -71,14 +77,81 @@ class EmulatorConsoleController: Controller() {
     fun writeLine(text: String) { output += "$text\n" }
 
     fun onInputEnterPressed() {
-        mainController.emulator.executeDebuggerCommand(input)
         val command = input
         input = ""
         inputEnabled = false
         runAsync {
-            mainController.emulator.executeDebuggerCommand(command)
+            try {
+                mainController.emulator.executeDebuggerCommand(command)
+            }catch (e: EmulationException) {
+                ui {
+                    alert(Alert.AlertType.ERROR, "CPU Emulation Error!", e.message, ButtonType.OK)
+                }
+            }
         } ui {
             inputEnabled = true
+        }
+    }
+}
+
+class AssemblerController: Controller() {
+    val mainController: EmulatorController by inject()
+
+    var lastMemoryAddress = -1
+    var lastProgramSize = 0
+
+    val sourceCodeProperty = SimpleStringProperty("")
+    var sourceCode by sourceCodeProperty
+
+    val memoryAddressProperty = SimpleStringProperty("")
+    var memoryAddress by memoryAddressProperty
+
+    val statusMessageProperty = SimpleStringProperty("")
+    var statusMessage by statusMessageProperty
+
+
+    fun onAssembleButtonPressed() {
+        val memAddr = memoryAddress.toInt(16)
+        runAsync {
+            try {
+                val compiled = Assembler.assemble(sourceCode)
+                if(lastMemoryAddress != memAddr) {
+                    lastMemoryAddress = memAddr
+                }else {
+                    for(addr in memAddr until memAddr + lastProgramSize)
+                        mainController.emulator.ram.setData(0x00.ubyte, addr.ushort)
+                }
+
+                lastProgramSize = compiled.size
+                for(addr in memAddr until memAddr + compiled.size)
+                    mainController.emulator.ram.setData(compiled[addr - memAddr], addr.ushort)
+                mainController.emulator.cpu.reset()
+                mainController.emulator.printStatus()
+                ui { statusMessage = "Assembled and written ($lastProgramSize bytes)" }
+            }catch (e: AssembleException) {
+                ui { statusMessage = "Failed: ${e.message}" }
+            }catch (e: Exception) {
+            ui {
+                e.printStackTrace()
+                statusMessage = "Unexpected Error!"
+                alert(Alert.AlertType.ERROR, "Fehlgeschlagen!", "Unerwarteter Fehler!\n${e.javaClass.simpleName}: ${e.message}", ButtonType.OK)
+            }
+        }
+        }
+    }
+
+    init {
+        var addr = mainController.emulator.cpu.PC.toString(16).toUpperCase()
+        while(addr.length < 4)
+            addr = "0$addr"
+        memoryAddress = addr
+
+        memoryAddressProperty.onChange {
+            if(it!!.length > 4)
+                mainController.uiHandleAsync { memoryAddress = it.substring(0, 4) }
+            val newText = it.filter { it in "0123456789ABCDEFabcdef" }
+            if(newText != it)
+                mainController.uiHandleAsync { memoryAddress = newText }
         }
     }
 }
