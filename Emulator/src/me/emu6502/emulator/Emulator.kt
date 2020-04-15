@@ -97,8 +97,6 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
     }
 
     fun executeDebuggerCommand(commandLine: String) {
-        printStatus()
-
         val cmdArgs = if(' ' in commandLine) commandLine.split(' ').toMutableList() else arrayListOf(commandLine)
         if(cmdArgs.isEmpty())
             return
@@ -153,6 +151,8 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
             }
             else -> reportError("Unbekannter Befehl! Tabulatortaste für eine Befehlsübersicht drücken.")
         }
+
+        printStatus()
     }
 
     init {
