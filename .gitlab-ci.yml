@@ -1,0 +1,25 @@
+image: maven:3-jdk-8
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+cache:
+  paths:
+    - .m2/repository
+    - target/kotlin-ic
+    - target/classes
+    - target/test-classes
+    - target/maven-archiver
+
+stages:
+  - package
+
+package_studipviewapi:
+  stage: package
+  script:
+    - mvn clean package
+  artifacts:
+    paths:
+      - target/*-with-dependencies.jar
+  tags:
+    - docker
