@@ -64,13 +64,13 @@ class CPU(val bus: Bus) {
 
     //region Stack operations
     private fun pushToStack(value: UByte) {
-        bus.setData(value, (SP + 0x0100.ubyte).ushort)
+        bus.setData(value, (SP.ushort + 0x0100.uint).ushort)
         SP--
     }
 
     private fun pullFromStack(): UByte {
         SP++
-        return bus.getData((SP + 0x0100.ubyte).ushort)
+        return bus.getData(SP.ushort + 0x0100.ushort)
     }
     //endregion
 
