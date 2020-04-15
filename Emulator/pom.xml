@@ -20,11 +20,6 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <dependencies>
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
-      <artifactId>kotlin-test</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jetbrains.kotlin</groupId>
       <artifactId>kotlin-stdlib</artifactId>
     </dependency>
     
@@ -57,7 +52,6 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
       <artifactId>tornadofx</artifactId>
       <version>1.7.20</version>
     </dependency>
-    
   </dependencies>
   
   
