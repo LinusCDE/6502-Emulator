@@ -153,5 +153,15 @@ class AssemblerController: Controller() {
             if(newText != it)
                 mainController.uiHandleAsync { memoryAddress = newText }
         }
+
+        sourceCode = """
+            LDA #€50
+            STA €00
+            LDA #€3C
+            STA €01
+            LDA #€FF
+            STA €02
+            JSR €F000
+        """.trimIndent().replace("€", "$")
     }
 }

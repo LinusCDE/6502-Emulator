@@ -6,7 +6,6 @@ import me.emu6502.lib6502.RAM
 import me.emu6502.lib6502.ROM
 import me.emu6502.kotlinutils.*
 import java.lang.Exception
-import java.lang.NumberFormatException
 import kotlin.system.exitProcess
 
 class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> Unit,
@@ -36,10 +35,9 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
         rom = ROM(4096.ushort, 0xF000.ushort)
         val initrom = UByteArray(4096)
         initrom[0x0FFD] = 0x02.ubyte
-        Routines.pixelDspRoutine.forEachIndexed { i, byte -> initrom[0x0000 + i] = byte }
-        Routines.charDspRoutine.forEachIndexed { i, byte -> initrom[0x001C + i] = byte }
 
-        Routines.testRoutine.forEachIndexed { i, byte -> ram.memory[0x0200 + i] = byte }
+        for(routine in Routine.values())
+            routine.data.forEachIndexed { i, byte -> initrom[routine.memoryAddress.int + i] = byte }
 
         rom.setMemory(initrom)
         mainbus.devices.add(rom)

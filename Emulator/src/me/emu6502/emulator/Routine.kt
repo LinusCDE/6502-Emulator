@@ -1,12 +1,11 @@
 package me.emu6502.emulator
 
+import me.emu6502.kotlinutils.ushort
 import me.emu6502.lib6502.Assembler
 
-class Routines {
-    companion object {
+enum class Routine(val memoryAddress: UShort, unformattedSourceCode: String) {
 
-        val charDspRoutine by lazy {
-            Assembler.assemble("""
+    CHAR_DSP(0x001C.ushort, """
                 LDA €D007
                 CMP #€01
                 BNE €F9
@@ -18,12 +17,9 @@ class Routines {
                 STA €D006
                 LDA #€02
                 STA €D007
-                RTS
-            """.trimIndent().replace('€', '$'))
-        }
+                RTS"""),
 
-        val pixelDspRoutine by lazy {
-            Assembler.assemble("""
+    PIXEL_DSP(0x0000.ushort, """
                 LDA €D003
                 CMP #€01
                 BNE €F9
@@ -36,20 +32,9 @@ class Routines {
                 LDA #€02
                 STA €D003
                 RTS
-            """.trimIndent().replace('€', '$'))
-        }
+            """);
 
-        val testRoutine by lazy {
-            Assembler.assemble("""
-                LDA #€50
-                STA €00
-                LDA #€3C
-                STA €01
-                LDA #€FF
-                STA €02
-                JSR €F000
-            """.trimIndent().replace('€', '$'))
-        }
+    val sourceCode = unformattedSourceCode.trimIndent().replace("€", "$")
+    val data by lazy { Assembler.assemble(sourceCode) }
 
-    }
 }
