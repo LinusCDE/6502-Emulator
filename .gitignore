@@ -1,10 +1,16 @@
+# Maven
+**/target/
+
+# IntelliJ
 **/out/
+**/.idea
+**.iml
+**/META-INF/
+
+# Temporary files not meant for git
+**.s
+**.asm
 **.vid
 **.bin
 **.bmp
 **.png
-
-**/target/
-**/.idea
-**.iml
-**/META-INF/
