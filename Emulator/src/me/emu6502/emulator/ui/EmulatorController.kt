@@ -113,30 +113,8 @@ class AssemblerController: Controller() {
     fun onAssembleButtonPressed() {
         val memAddr = memoryAddress.toInt(16)
         runAsync {
-            try {
-                val compiled = Assembler.assemble(sourceCode)
-                if(lastMemoryAddress != memAddr) {
-                    lastMemoryAddress = memAddr
-                }else {
-                    for(addr in memAddr until memAddr + lastProgramSize)
-                        mainController.emulator.ram.setData(0x00.ubyte, addr.ushort)
-                }
-
-                lastProgramSize = compiled.size
-                for(addr in memAddr until memAddr + compiled.size)
-                    mainController.emulator.ram.setData(compiled[addr - memAddr], addr.ushort)
-                mainController.emulator.cpu.reset()
-                mainController.emulator.printStatus()
-                ui { statusMessage = "Assembled and written ($lastProgramSize bytes)" }
-            }catch (e: AssembleException) {
-                ui { statusMessage = "Failed: ${e.message}" }
-            }catch (e: Exception) {
-            ui {
-                e.printStackTrace()
-                statusMessage = "Unexpected Error!"
-                alert(Alert.AlertType.ERROR, "Fehlgeschlagen!", "Unerwarteter Fehler!\n${e.javaClass.simpleName}: ${e.message}", ButtonType.OK)
-            }
-        }
+            val (_, status) = mainController.emulator.assembleToMemory(sourceCode, memAddr)
+            ui { statusMessage = status }
         }
     }
 

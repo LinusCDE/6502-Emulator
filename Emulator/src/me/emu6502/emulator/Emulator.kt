@@ -1,11 +1,13 @@
 package me.emu6502.emulator
 
-import me.emu6502.lib6502.Bus
-import me.emu6502.lib6502.CPU
-import me.emu6502.lib6502.RAM
-import me.emu6502.lib6502.ROM
+import javafx.scene.control.Alert
+import javafx.scene.control.ButtonType
 import me.emu6502.kotlinutils.*
+import me.emu6502.lib6502.*
+import tornadofx.alert
+import java.io.File
 import java.lang.Exception
+import java.nio.file.WatchService
 import kotlin.system.exitProcess
 
 class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> Unit,
@@ -147,6 +149,25 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
                 updateScreen(screen)
                 //textscreen.screenshot()
             }
+            "as" -> {
+                if(cmdArgs.size < 2) {
+                    reportError("Fehlerhafte Eingabe. Bitte Adresse und dateinamen angeben.")
+                    return
+                }
+
+                setUShortOrComplain(cmdArgs) { memAddr ->
+                    cmdArgs.removeAt(0)
+                    val file = File(cmdArgs.joinToString(" "))
+                    if(!file.exists() || file.isDirectory) {
+                        reportError("Fehlerhafte Eingabe. Die Datei wurde nicht gefunden.")
+                        return@setUShortOrComplain
+                    }
+
+                    val (success, message) = assembleToMemory(file.readText(), memAddr.int)
+                    if(!success)
+                        reportError(message)
+                }
+            }
             else -> reportError("Unbekannter Befehl! Tabulatortaste für eine Befehlsübersicht drücken.")
         }
 
@@ -174,7 +195,36 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
         defineCommand("ba", "ba", "Add breakpoint")
         defineCommand("br", "br", "Remove breakpoint")
         defineCommand("r", "r", "Run until breakpoint or end")
+        defineCommand("as", "as", "Assemble file to memory address")
 
         reset()
+    }
+
+
+    var lastMemoryAddress = -1
+    var lastProgramSize = 0
+
+    fun assembleToMemory(sourceCode: String, memAddr: Int): Pair<Boolean/*Success*/, String/*Message*/> {
+        try {
+            val compiled = Assembler.assemble(sourceCode)
+            if (lastMemoryAddress != memAddr) {
+                lastMemoryAddress = memAddr
+            } else {
+                for (addr in memAddr until memAddr + lastProgramSize)
+                    ram.setData(0x00.ubyte, addr.ushort)
+            }
+
+            lastProgramSize = compiled.size
+            for (addr in memAddr until memAddr + compiled.size)
+                ram.setData(compiled[addr - memAddr], addr.ushort)
+            cpu.reset()
+            printStatus()
+            return true to "Assembled and written ($lastProgramSize bytes)"
+        } catch (e: AssembleException) {
+            return false to "Failed: ${e.message}"
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false to "Unexpected Error!"
+        }
     }
 }
