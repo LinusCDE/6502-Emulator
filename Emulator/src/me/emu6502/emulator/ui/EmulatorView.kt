@@ -1,12 +1,20 @@
 package me.emu6502.emulator.ui
 
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleObjectProperty
+import com.kodedu.terminalfx.Terminal
+import com.kodedu.terminalfx.TerminalBuilder
+import com.kodedu.terminalfx.config.TerminalConfig
 import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.StringProperty
 import javafx.geometry.Pos
 import javafx.scene.Parent
-import javafx.scene.image.Image
+import javafx.scene.text.Text
+import me.emu6502.emulator.Console
+import me.emu6502.kotlinutils.io.PatientPipedReader
+import me.emu6502.kotlinutils.io.PatientPipedWriter
 import tornadofx.*
+import java.io.*
+import java.lang.StringBuilder
+import java.nio.file.Paths
 
 class EmulatorApp: App(EmulatorWindow::class)
 
@@ -18,7 +26,7 @@ class CommandInfo(name: String = "", description: String = "") {
     var description by descriptionProperty
 }
 
-class EmulatorWindow: View() {
+class EmulatorWindow: View(title = "6502-Emulator") {
     val controller: EmulatorController by inject()
 
     override val root: Parent = hbox {
@@ -45,15 +53,17 @@ class EmulatorWindow: View() {
 class EmulatorConsoleView: View() {
     val controller: EmulatorConsoleController by inject()
 
-    val output = textarea(controller.outputProperty) {
-        isEditable = false
-        isWrapText = true
+    val output = Terminal(TerminalConfig().apply {
+        windowsTerminalStarter = ""
+        //unixTerminalStarter = "/usr/bin/cat"
+        unixTerminalStarter = ""
+        isCursorBlink = true
+    }, Paths.get("")).apply {
         style {
-            prefColumnCount = 140
-            prefRowCount = 38
-            fontFamily = "monospaced"
-            //fontSize = Dimension(9.0, Dimension.LinearUnits.pt)
+            prefWidth = Dimension(134.0 * 0.7, Dimension.LinearUnits.em)
+            prefHeight = Dimension(38.0 * 0.7, Dimension.LinearUnits.em)
         }
+        inputReader = BufferedReader(PatientPipedReader(controller.inputWriter))
     }
 
     override val root: Parent = borderpane {

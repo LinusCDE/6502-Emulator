@@ -10,13 +10,19 @@ import javafx.scene.control.Alert
 import javafx.scene.control.ButtonType
 import javafx.scene.image.Image
 import me.emu6502.emulator.Emulator
+import me.emu6502.kotlinutils.io.PatientPipedReader
+import me.emu6502.kotlinutils.io.PatientPipedWriter
 import me.emu6502.kotlinutils.ubyte
 import me.emu6502.kotlinutils.ushort
+import me.emu6502.kotlinutils.vt100.VT100Sequence
 import me.emu6502.lib6502.AssembleException
 import me.emu6502.lib6502.Assembler
 import me.emu6502.lib6502.EmulationException
 import tornadofx.*
+import java.io.*
 import java.lang.Exception
+import java.util.concurrent.Executors
+import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -28,9 +34,9 @@ class EmulatorController: Controller() {
     val console: EmulatorConsoleController by inject()
 
     val emulator = Emulator(
-            clear = {  uiHandleAsync { console.clear() } },
-            write = { text ->  uiHandleAsync { console.write(text) } },
-            writeLine = { text ->  uiHandleAsync { console.writeLine(text) } },
+            clear = {  run { console.clear() } },
+            write = { text ->  run { console.write(text) } },
+            writeLine = { text ->  run { console.writeLine(text) } },
             defineCommand = { _, displayName, desc -> commands.add(CommandInfo(displayName, desc)) },
             reportError = {
                 uiHandleSync { alert(Alert.AlertType.ERROR, "Emulator-Fehler", it, ButtonType.OK) }
@@ -63,18 +69,50 @@ class EmulatorController: Controller() {
 class EmulatorConsoleController: Controller() {
     val mainController: EmulatorController by inject()
 
-    val outputProperty = SimpleStringProperty("")
-    var output by outputProperty
+    val inputEnabledProperty = SimpleBooleanProperty(true)
+    var inputEnabled by inputEnabledProperty
 
     val inputProperty = SimpleStringProperty("")
     var input by inputProperty
 
-    val inputEnabledProperty = SimpleBooleanProperty(true)
-    var inputEnabled by inputEnabledProperty
+    val inputWriter = PatientPipedWriter()
 
-    fun clear() { output = "" }
-    fun write(text: String) { output += text }
-    fun writeLine(text: String) { output += "$text\n" }
+    val inputWriterQueue = LinkedBlockingQueue<String>()
+
+    val executorService = Executors.newSingleThreadExecutor()
+
+    private fun writeLater(doFlush: Boolean = false) {
+        executorService.submit {
+
+            val text = inputWriterQueue.poll()
+
+            runAsync {
+                inputWriter.write(text)
+                if(doFlush)
+                    inputWriter.flush()
+            }
+
+        }
+    }
+
+    fun clear() {
+        //inputWriter.write("${VT100Sequence.CURSOR_HOME}${VT100Sequence.ERASE_DOWN}")
+        write("${VT100Sequence.CURSOR_HOME}${VT100Sequence.ERASE_DOWN}")
+    }
+
+    fun write(text: String) {
+        //inputWriter.write(text)
+        //inputWriter.flush()
+        inputWriterQueue.put(text)
+        writeLater()
+    }
+
+    fun writeLine(text: String) {
+        //inputWriter.write(text + "\r\n")
+        //inputWriter.flush()
+        inputWriterQueue.put("$text\r\n")
+        writeLater(doFlush = true)
+    }
 
     fun onInputEnterPressed() {
         val command = input

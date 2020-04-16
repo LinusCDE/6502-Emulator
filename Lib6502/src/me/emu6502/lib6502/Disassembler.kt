@@ -5,9 +5,9 @@ import me.emu6502.kotlinutils.*
 class Disassembler {
     companion object {
 
-        fun disassemble(code: UByteArray, pc: Int): String {
-            var pc = pc
-            return when (code[pc].toInt()) {
+        fun disassembleVerbose(code: UByteArray, memoryAddress: Int): Pair<String/*ASM*/, Int/*Instruction size*/> {
+            var pc = memoryAddress
+            val string = when (code[pc].toInt()) {
                 0x00 -> "BRK"
                 0x01 -> indirectXCode("ORA", code[++pc])
                 0x05 -> zeropageCode("ORA", code[++pc])
@@ -161,7 +161,10 @@ class Disassembler {
                 0xFE -> absXCode("INC", code[++pc], code[++pc])
                 else -> "Data " + code[0].toString(16).toUpperCase()
             }
+            return string to pc - memoryAddress
         }
+
+        fun disassemble(code: UByteArray, memoryAddress: Int): String = disassembleVerbose(code, memoryAddress).first
 
         fun disassemble(code: String): String {
             val sbytes = code.split(' ');
