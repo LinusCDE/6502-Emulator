@@ -1,18 +1,31 @@
 package me.emu6502.emulator
 
-import javafx.scene.control.Alert
-import javafx.scene.control.ButtonType
 import me.emu6502.kotlinutils.*
 import me.emu6502.lib6502.*
-import tornadofx.alert
 import java.io.File
-import java.lang.Exception
-import java.nio.file.WatchService
+import me.emu6502.kotlinutils.vt100.*
+import java.lang.StringBuilder
 import kotlin.system.exitProcess
 
 class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> Unit,
                val clear: () -> Unit, val write: (String) -> Unit, val writeLine: (String) -> Unit,
                val defineCommand: (name: String, displayName: String, desc: String) -> Unit) {
+
+    companion object {
+        enum class MemoryTag(var memoryStart: UShort, var memoryEnd: UShort, vararg val attributes: VT100Attribute, var visible: Boolean = true) {
+            INSTRUCTION_OPCODE_PC(0.ushort, 0.ushort, VT100BackgroundColor.CYAN),
+            INSTRUCTION_DATA(0.ushort, 0.ushort, VT100BackgroundColor.YELLOW),
+
+            ZEROPAGE(0x0000.ushort, 0x00FF.ushort, VT100Display.DIM, VT100ForegroundColor.MAGENTA),
+            STACK(0x0100.ushort, 0x01FF.ushort, VT100Display.DIM, VT100ForegroundColor.BLUE),
+            VECTORS(0xFFFA.ushort, 0xFFFF.ushort, VT100ForegroundColor.RED, VT100Display.DIM)
+        }
+
+        fun findMemoryTag(memoryAddress: UShort): MemoryTag? =
+                MemoryTag.values()
+                        .filter { it.visible }
+                        .firstOrNull { memoryAddress >= it.memoryStart && memoryAddress <= it.memoryEnd }
+    }
 
     lateinit var cpu: CPU
     lateinit var mainbus: Bus
@@ -21,6 +34,9 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
     lateinit var screen: Screen
     lateinit var charrom: ROM
     lateinit var textscreen: TextScreen
+
+    data class MemoryColorSet(var foregroundColor: VT100ForegroundColor?, var backgroundColor: VT100BackgroundColor?,
+                              var display: VT100Display?)
 
     val breakpoints = arrayListOf<UShort>()
     var currentpage: UShort = 0.ushort
@@ -85,15 +101,42 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
     fun printStatus(currentPage: UShort = this.currentpage) {
         clear()
         writeLine(cpu.toString())
+
+        //writeLine("${VT100Sequence.SET_ATTRIBUTE_MODE.toString(VT100Display.RESET_ALL_ATTRIBUTES)}")
+        MemoryTag.INSTRUCTION_OPCODE_PC.memoryStart = cpu.PC
+        MemoryTag.INSTRUCTION_OPCODE_PC.memoryEnd = cpu.PC
+        val (_, instructionSize) = Disassembler.disassembleVerbose(ubyteArrayOf(mainbus.getData(cpu.PC), mainbus.getData((cpu.PC + 1.ushort).ushort), mainbus.getData((cpu.PC + 2.ushort).ushort)), 0)
+        MemoryTag.INSTRUCTION_DATA.memoryStart = (cpu.PC + 1.uint).ushort
+        MemoryTag.INSTRUCTION_DATA.memoryEnd = (cpu.PC.int + 1 + (instructionSize - 1)).ushort
+
+        //ubyteArrayOf(bus.getData(PC), bus.getData((PC + 1.ushort).ushort), bus.getData((PC + 2.ushort).ushort))
+
+        var lastMemoryTag: MemoryTag? = null
         var line: Int = currentpage.toInt()
         while(line < if((currentpage + 0x0400.uint) > 65536.uint) 65536 else currentpage.toInt() + 0x0400) {
-            write("$" + line.toString("X4") + ":")
-            for (pc in line until (line + 32))
-                write(" $" + mainbus.getData(pc.ushort).toString("X2"))
-            writeLine("")
+            val builder = StringBuilder()
+            builder.append(VT100Sequence.SET_ATTRIBUTE_MODE.toString(VT100Display.RESET_ALL_ATTRIBUTES))
+            lastMemoryTag = null // To reapply after row name
+            builder.append("$" + line.toString("X4") + ": ")
+            for (pc in line until (line + 32)) {
+
+                // Colorize memory
+                val tag = findMemoryTag(pc.ushort)
+                if(tag != lastMemoryTag) {
+                    // Remove color from previous space
+                    builder.append("${VT100Sequence.SET_ATTRIBUTE_MODE.toString(VT100Display.RESET_ALL_ATTRIBUTES)}\b ")
+
+                    // Reset attributes and apply new ones for memory tag
+                    builder.append(VT100Sequence.SET_ATTRIBUTE_MODE.toString(VT100Display.RESET_ALL_ATTRIBUTES, *tag?.attributes ?: arrayOf()))
+                    lastMemoryTag = tag
+                }
+
+                builder.append("$" + mainbus.getData(pc.ushort).toString("X2") + if(pc < line + 32) " " else "")
+            }
+            writeLine(builder.toString())
             line += 32
         }
-        writeLine("")
+        writeLine(VT100Sequence.SET_ATTRIBUTE_MODE.toString(VT100Display.RESET_ALL_ATTRIBUTES) ?: "")
     }
 
     fun executeDebuggerCommand(commandLine: String) {
