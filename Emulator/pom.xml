@@ -18,13 +18,6 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
   </properties>
 
 
-  <repositories>
-    <repository>
-      <id>terminalfx-repo</id>
-      <url>https://github.com/javaterminal/terminalfx/raw/master/releases</url>
-    </repository>
-  </repositories>
-
   <dependencies>
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
@@ -73,29 +66,10 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
         <version>${javafx.version}</version>
     </dependency>
 
-    <!-- Currently not needed and blow up the size like crazy -->
-    <!-- <dependency>
-        <groupId>org.openjfx</groupId>
-        <artifactId>javafx-graphics</artifactId>
-        <version>${javafx.version}</version>
-    </dependency> -->
-
-    <dependency>
-        <groupId>org.openjfx</groupId>
-        <artifactId>javafx-web</artifactId>
-        <version>${javafx.version}</version>
-    </dependency>
-
     <dependency>
       <groupId>no.tornado</groupId>
       <artifactId>tornadofx</artifactId>
       <version>1.7.20</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.kodedu.terminalfx</groupId>
-      <artifactId>terminalfx</artifactId>
-      <version>1.0.8</version> <!-- Java 8 -->
     </dependency>
   </dependencies>
   

@@ -10,9 +10,6 @@ import org.jline.terminal.TerminalBuilder
  */
 class Console {
     companion object {
-        private const val CARRIAGE_RETURN = 0x0D.toChar() // aka Enter
-        private const val DEL = 0x7F.toChar() // aka Backspace
-
         val terminal = TerminalBuilder.terminal().apply { enterRawMode() }
         val reader = terminal.reader()
         val writer = terminal.writer()

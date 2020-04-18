@@ -10,19 +10,10 @@ import javafx.scene.control.Alert
 import javafx.scene.control.ButtonType
 import javafx.scene.image.Image
 import me.emu6502.emulator.Emulator
-import me.emu6502.kotlinutils.io.PatientPipedReader
-import me.emu6502.kotlinutils.io.PatientPipedWriter
-import me.emu6502.kotlinutils.ubyte
-import me.emu6502.kotlinutils.ushort
 import me.emu6502.kotlinutils.vt100.VT100Sequence
-import me.emu6502.lib6502.AssembleException
-import me.emu6502.lib6502.Assembler
 import me.emu6502.lib6502.EmulationException
 import tornadofx.*
-import java.io.*
-import java.lang.Exception
-import java.util.concurrent.Executors
-import java.util.concurrent.LinkedBlockingQueue
+import java.lang.StringBuilder
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -34,9 +25,9 @@ class EmulatorController: Controller() {
     val console: EmulatorConsoleController by inject()
 
     val emulator = Emulator(
-            clear = {  run { console.clear() } },
-            write = { text ->  run { console.write(text) } },
-            writeLine = { text ->  run { console.writeLine(text) } },
+            clear = {  console.clear() },
+            write = { text -> console.write(text) },
+            writeLine = { text -> console.writeLine(text) },
             defineCommand = { _, displayName, desc -> commands.add(CommandInfo(displayName, desc)) },
             reportError = {
                 uiHandleSync { alert(Alert.AlertType.ERROR, "Emulator-Fehler", it, ButtonType.OK) }
@@ -75,44 +66,24 @@ class EmulatorConsoleController: Controller() {
     val inputProperty = SimpleStringProperty("")
     var input by inputProperty
 
-    val inputWriter = PatientPipedWriter()
-
-    val inputWriterQueue = LinkedBlockingQueue<String>()
-
-    val executorService = Executors.newSingleThreadExecutor()
-
-    private fun writeLater(doFlush: Boolean = false) {
-        executorService.submit {
-
-            val text = inputWriterQueue.poll()
-
-            runAsync {
-                inputWriter.write(text)
-                if(doFlush)
-                    inputWriter.flush()
-            }
-
-        }
-    }
+    var writeFunc: ((text: String) -> Unit)? = null
 
     fun clear() {
-        //inputWriter.write("${VT100Sequence.CURSOR_HOME}${VT100Sequence.ERASE_DOWN}")
         write("${VT100Sequence.CURSOR_HOME}${VT100Sequence.ERASE_DOWN}")
     }
 
+    var outputPreConnectCache: StringBuilder? = StringBuilder()
+
     fun write(text: String) {
-        //inputWriter.write(text)
-        //inputWriter.flush()
-        inputWriterQueue.put(text)
-        writeLater()
+        if(writeFunc != null)
+            writeFunc!!(text)
+        else if(outputPreConnectCache != null) {
+            // The view will write this as soon as it sets the writerFunc
+            outputPreConnectCache?.append(text)
+        }
     }
 
-    fun writeLine(text: String) {
-        //inputWriter.write(text + "\r\n")
-        //inputWriter.flush()
-        inputWriterQueue.put("$text\r\n")
-        writeLater(doFlush = true)
-    }
+    fun writeLine(text: String) = write("$text\n")
 
     fun onInputEnterPressed() {
         val command = input
