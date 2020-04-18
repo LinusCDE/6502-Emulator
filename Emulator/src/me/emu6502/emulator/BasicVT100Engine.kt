@@ -136,7 +136,7 @@ class BasicVT100Engine(val columns: Int, val rows: Int, val tabSize: Int = 8,
                 }
                 // Tab
                 '\t' -> {
-                    write(String(CharArray(cursorCol % tabSize) {' '}))
+                    write(String(CharArray(tabSize - cursorCol % tabSize) {' '}))
                     i++
                 }
                 // New line
