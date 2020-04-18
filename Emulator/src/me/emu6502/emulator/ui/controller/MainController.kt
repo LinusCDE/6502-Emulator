@@ -9,7 +9,6 @@ import javafx.scene.control.ButtonType
 import javafx.scene.image.Image
 import me.emu6502.emulator.Emulator
 import me.emu6502.emulator.ui.CommandInfo
-import me.emu6502.emulator.ui.controller.ConsoleController
 import tornadofx.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock

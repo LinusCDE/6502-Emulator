@@ -1,4 +1,4 @@
-package me.emu6502.emulator.ui
+package me.emu6502.emulator.ui.view
 
 import javafx.animation.AnimationTimer
 import javafx.scene.canvas.Canvas

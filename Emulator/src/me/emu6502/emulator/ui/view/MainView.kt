@@ -3,17 +3,14 @@ package me.emu6502.emulator.ui.view
 import javafx.scene.Parent
 import me.emu6502.emulator.ui.CommandInfo
 import me.emu6502.emulator.ui.controller.MainController
-import me.emu6502.emulator.ui.view.AssemblerView
-import me.emu6502.emulator.ui.view.ConsoleView
 import tornadofx.*
-
 
 class MainView: View(title = "6502-Emulator") {
     val controller: MainController by inject()
 
     override val root: Parent = hbox {
-        add(find<AssemblerView>())
-        add(find<ConsoleView>())
+        add(AssemblerView())
+        add(ConsoleView())
         vbox {
             label("Screen:")
             imageview {
