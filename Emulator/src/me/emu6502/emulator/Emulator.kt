@@ -16,7 +16,7 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
             INSTRUCTION_OPCODE_PC(0.ushort, 0.ushort, VT100BackgroundColor.CYAN),
             INSTRUCTION_DATA(0.ushort, 0.ushort, VT100BackgroundColor.YELLOW),
 
-            LAST_ASSEMBLY(0.ushort, 0.ushort, VT100ForegroundColor.GREEN, VT100Display.DIM, visible = false),
+            LAST_ASSEMBLY(0.ushort, 0.ushort, VT100Display.DIM, visible = false),
 
             ZEROPAGE(0x0000.ushort, 0x00FF.ushort, VT100Display.DIM, VT100ForegroundColor.MAGENTA),
             STACK(0x0100.ushort, 0x01FF.ushort, VT100Display.DIM, VT100ForegroundColor.BLUE),
