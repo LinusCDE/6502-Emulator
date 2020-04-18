@@ -13,9 +13,14 @@ import me.emu6502.kotlinutils.vt100.VT100BackgroundColor
 import me.emu6502.kotlinutils.vt100.VT100ForegroundColor
 import tornadofx.onChange
 
+/**
+ * Todo: Implement underscore (and hidden) styles
+ */
 class BasicVT100View(val cols: Int, val rows: Int): Canvas() {
 
-    private var engine = BasicVT100Engine(cols, rows)
+    companion object {
+        const val BLINK_DURATION = 1000 // ms
+    }
 
     enum class TermColor(defaultH: Float, defaultS: Float, defaultV: Float,
                       dimH: Float, dimS: Float, dimV: Float,
@@ -43,6 +48,8 @@ class BasicVT100View(val cols: Int, val rows: Int): Canvas() {
         val brightPaint by lazy { Paint.valueOf(brightHexCode) }
     }
 
+    private var engine = BasicVT100Engine(cols, rows)
+
     val colorMap = hashMapOf<VT100Attribute, TermColor>(
             VT100BackgroundColor.BLACK to TermColor.BLACK,
             VT100BackgroundColor.RED to TermColor.RED,
@@ -66,6 +73,8 @@ class BasicVT100View(val cols: Int, val rows: Int): Canvas() {
     private val charHeight: Double
     private val font = Font.font("monospaced")
 
+    private var hasBlinkingCells = false
+    private var lastBlinkRefresh: Long = 0
     private var doDraw = true // Set to true after some write to the engine occurred. To reduce load
 
     private val drawTimer: AnimationTimer = object: AnimationTimer() {
@@ -78,7 +87,7 @@ class BasicVT100View(val cols: Int, val rows: Int): Canvas() {
                }
             }
 
-            if(performDraw)
+            if(performDraw || (hasBlinkingCells && System.currentTimeMillis() - lastBlinkRefresh > BLINK_DURATION))
                 draw()
         }
     }
@@ -107,6 +116,7 @@ class BasicVT100View(val cols: Int, val rows: Int): Canvas() {
 
     fun draw() {
         //val start = System.currentTimeMillis()
+        hasBlinkingCells = false
 
         val ctx = graphicsContext2D
         ctx.font = font
@@ -123,6 +133,8 @@ class BasicVT100View(val cols: Int, val rows: Int): Canvas() {
             val row = absRow - engine.consoleTop
             for (col in 0 until engine.columns) {
                 val cell = engine.cells[absRow][col]
+                if(cell.cellStyle.blink)
+                    hasBlinkingCells = true
 
                 val selectedBg = cell.cellStyle.backgroundColor ?: engine.defaultBackground
                 val paintBg = if(selectedBg == null) Color.TRANSPARENT else colorMap[selectedBg]!!.defaultPaint
@@ -138,8 +150,11 @@ class BasicVT100View(val cols: Int, val rows: Int): Canvas() {
                     ctx.fill = paintBg
                     ctx.fillRect(x, y + 3, charWidth + 0.5, charHeight + 0.5)
                 }
-                ctx.fill = paintFg
-                ctx.fillText((cell.char ?: ' ').toString(), x, y + charHeight)
+
+                if(!cell.cellStyle.blink || lastBlinkRefresh == 0L || (System.currentTimeMillis() - lastBlinkRefresh) % (BLINK_DURATION*2) < BLINK_DURATION) {
+                    ctx.fill = paintFg
+                    ctx.fillText((cell.char ?: ' ').toString(), x, y + charHeight)
+                }
 
                 x += charWidth
             }
@@ -147,6 +162,13 @@ class BasicVT100View(val cols: Int, val rows: Int): Canvas() {
         }
 
         //println("Update-Time: ${System.currentTimeMillis() - start} ms")
+
+        if(hasBlinkingCells) {
+            if (lastBlinkRefresh == 0L)
+                lastBlinkRefresh = System.currentTimeMillis()
+        }else {
+            lastBlinkRefresh = 0
+        }
     }
 
     fun write(text: String) {
