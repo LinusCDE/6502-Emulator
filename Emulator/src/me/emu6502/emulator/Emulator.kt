@@ -16,6 +16,8 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
             INSTRUCTION_OPCODE_PC(0.ushort, 0.ushort, VT100BackgroundColor.CYAN),
             INSTRUCTION_DATA(0.ushort, 0.ushort, VT100BackgroundColor.YELLOW),
 
+            LAST_ASSEMBLY(0.ushort, 0.ushort, VT100ForegroundColor.GREEN, VT100Display.DIM, visible = false),
+
             ZEROPAGE(0x0000.ushort, 0x00FF.ushort, VT100Display.DIM, VT100ForegroundColor.MAGENTA),
             STACK(0x0100.ushort, 0x01FF.ushort, VT100Display.DIM, VT100ForegroundColor.BLUE),
             VECTORS(0xFFFA.ushort, 0xFFFF.ushort, VT100ForegroundColor.RED, VT100Display.DIM)
@@ -261,6 +263,9 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
             for (addr in memAddr until memAddr + compiled.size)
                 ram.setData(compiled[addr - memAddr], addr.ushort)
             cpu.reset()
+            MemoryTag.LAST_ASSEMBLY.visible = true
+            MemoryTag.LAST_ASSEMBLY.memoryStart = memAddr.ushort
+            MemoryTag.LAST_ASSEMBLY.memoryEnd = (memAddr + compiled.size - 1).ushort
             printStatus()
             return true to "Assembled and written ($lastProgramSize bytes)"
         } catch (e: AssembleException) {
