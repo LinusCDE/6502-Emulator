@@ -5,7 +5,7 @@ import me.emu6502.emulator.ui.CommandInfo
 import me.emu6502.emulator.ui.controller.MainController
 import tornadofx.*
 
-class MainView: View(title = "6502-Emulator") {
+class MainView: View(title = "6j502-Emulator") {
     val controller: MainController by inject()
 
     override val root: Parent = hbox {
