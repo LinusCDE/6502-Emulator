@@ -309,6 +309,12 @@ class BasicVT100Engine(val columns: Int, val rows: Int, val tabSize: Int = 8,
                 }
             }
         }
+
+        // Keep max lines of maxBufferSize
+        while(cells.size > maxBufferSize) {
+            cells.removeAt(0)
+            consoleTop = max(0, consoleTop - 1)
+        }
     }
 
     private fun toNextRow() {
