@@ -176,7 +176,7 @@ class BasicVT100Engine(val columns: Int, val rows: Int, val tabSize: Int = 8,
                                 currentCellStyle.apply(*parsed.toTypedArray())
                             }
                             VT100Sequence.ERASE_DOWN -> {
-                                write(VT100Sequence.ERASE_END_OF_LINE.toString()!!)
+                                write(VT100Sequence.ERASE_END_OF_LINE.toString())
                                 if(cursorRow == 0)
                                     consoleTop = cells.size - 1
                                 else {
@@ -245,14 +245,14 @@ class BasicVT100Engine(val columns: Int, val rows: Int, val tabSize: Int = 8,
                                     cells[consoleTop + cursorRow][col].erase()
                             }
                             VT100Sequence.ERASE_UP -> {
-                                write(VT100Sequence.ERASE_START_OF_LINE.toString()!!)
+                                write(VT100Sequence.ERASE_START_OF_LINE.toString())
                                 for(row in consoleTop until cells.size)
                                     for(col in 0 until columns)
                                         cells[row][col].erase()
                             }
                             VT100Sequence.FONT_SET_G0_DEFAULT -> {} // Only one font used
                             VT100Sequence.FONT_SET_G1_ALTERNATE -> warnNotSupported(seq.name)
-                            VT100Sequence.FORCE_CURSOR_POSITION -> write(VT100Sequence.CURSOR_HOME.toString()!!) // Same
+                            VT100Sequence.FORCE_CURSOR_POSITION -> write(VT100Sequence.CURSOR_HOME.toString()) // Same
                             VT100Sequence.PRINT_LINE -> warnNotSupported(seq.name) // Ancient
                             VT100Sequence.PRINT_SCREEN -> warnNotSupported(seq.name) // Ancient
                             VT100Sequence.QUERY_CURSOR_POSITION -> warnNotSupported(seq.name)
