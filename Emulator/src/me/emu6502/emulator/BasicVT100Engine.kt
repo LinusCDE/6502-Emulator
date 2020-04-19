@@ -4,7 +4,7 @@ import me.emu6502.kotlinutils.vt100.*
 import java.lang.Integer.max
 
 class BasicVT100Engine(val columns: Int, val rows: Int, val tabSize: Int = 8,
-                       initialIsNewLineMode: Boolean = true, val maxBufferSize: Int = 2048) {
+                       initialIsNewLineMode: Boolean = true, val maxBufferSize: Int = 512) {
 
     data class Cell(var char: Char?, var cellStyle: CellStyle) {
         fun erase() {
