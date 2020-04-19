@@ -153,7 +153,8 @@ class BasicVT100View(val cols: Int, val rows: Int): Canvas() {
                 if(!cell.cellStyle.blink || lastBlinkRefresh == 0L || (System.currentTimeMillis() - lastBlinkRefresh) % (BLINK_DURATION*2) < BLINK_DURATION) {
                     if(!cell.cellStyle.hidden) {
                         ctx.fill = paintFg
-                        ctx.fillText((cell.char ?: ' ').toString(), x, y + charHeight)
+                        if(cell.char != null && !cell.char!!.isWhitespace())
+                            ctx.fillText(cell.char.toString(), x, y + charHeight)
                         if(cell.cellStyle.underscore)
                             ctx.fillRect(x, y + charHeight + 2, charWidth + 1, 0.75)
                     }
