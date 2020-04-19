@@ -10,7 +10,7 @@
   <packaging>pom</packaging>
 
   <properties> <!-- Global (all childs have these) -->
-    <revision>0.0.1-SNAPSHOT</revision> <!-- Project version -->
+    <revision>0.1.0-SNAPSHOT</revision> <!-- Project version -->
     
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     
