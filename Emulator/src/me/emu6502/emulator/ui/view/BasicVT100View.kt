@@ -13,9 +13,6 @@ import me.emu6502.kotlinutils.vt100.VT100BackgroundColor
 import me.emu6502.kotlinutils.vt100.VT100ForegroundColor
 import tornadofx.onChange
 
-/**
- * Todo: Implement underscore (and hidden) styles
- */
 class BasicVT100View(val cols: Int, val rows: Int): Canvas() {
 
     companion object {
@@ -136,10 +133,12 @@ class BasicVT100View(val cols: Int, val rows: Int): Canvas() {
                 if(cell.cellStyle.blink)
                     hasBlinkingCells = true
 
-                val selectedBg = cell.cellStyle.backgroundColor ?: engine.defaultBackground
+                val cellBg = if(cell.cellStyle.reverse) cell.cellStyle.foregroundColor else cell.cellStyle.backgroundColor
+                val cellFg = if(cell.cellStyle.reverse) cell.cellStyle.backgroundColor else cell.cellStyle.foregroundColor
+                val selectedBg = cellBg ?: engine.defaultBackground
                 val paintBg = if(selectedBg == null) Color.TRANSPARENT else colorMap[selectedBg]!!.defaultPaint
 
-                val termFg = colorMap[cell.cellStyle.foregroundColor ?: VT100ForegroundColor.BLACK]!!
+                val termFg = colorMap[cellFg ?: VT100ForegroundColor.BLACK]!!
                 val paintFg = when {
                     cell.cellStyle.dim -> termFg.dimPaint
                     cell.cellStyle.bright -> termFg.brightPaint
@@ -148,12 +147,16 @@ class BasicVT100View(val cols: Int, val rows: Int): Canvas() {
 
                 if(paintBg != Color.TRANSPARENT) {
                     ctx.fill = paintBg
-                    ctx.fillRect(x, y + 3, charWidth + 0.5, charHeight + 0.5)
+                    ctx.fillRect(x, y + 3, charWidth + 1, charHeight + 1)
                 }
 
                 if(!cell.cellStyle.blink || lastBlinkRefresh == 0L || (System.currentTimeMillis() - lastBlinkRefresh) % (BLINK_DURATION*2) < BLINK_DURATION) {
-                    ctx.fill = paintFg
-                    ctx.fillText((cell.char ?: ' ').toString(), x, y + charHeight)
+                    if(!cell.cellStyle.hidden) {
+                        ctx.fill = paintFg
+                        ctx.fillText((cell.char ?: ' ').toString(), x, y + charHeight)
+                        if(cell.cellStyle.underscore)
+                            ctx.fillRect(x, y + charHeight + 2, charWidth + 1, 0.75)
+                    }
                 }
 
                 x += charWidth
