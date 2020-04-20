@@ -2,6 +2,7 @@ package me.emu6502.emulator.ui.view
 
 import javafx.geometry.Pos
 import javafx.scene.Parent
+import javafx.scene.control.Tooltip
 import me.emu6502.emulator.ui.controller.AssemblerController
 import tornadofx.*
 
@@ -32,6 +33,9 @@ class AssemblerView: View() {
                 fontFamily = "monospaced"
             }
         }
-        bottom = label(controller.statusMessageProperty)
+        bottom = label(controller.statusMessageProperty) {
+            tooltip = Tooltip()
+            tooltip.textProperty().bind(controller.statusMessageProperty)
+        }
     }
 }
