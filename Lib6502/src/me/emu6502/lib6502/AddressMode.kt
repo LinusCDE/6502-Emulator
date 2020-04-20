@@ -36,7 +36,7 @@ enum class AddressMode(val addressBytes: Int, val prefix: String, val suffix: St
     fun toString(data: UByteArray): String? {
         if(data.size != addressBytes)
             return null
-        return prefix + data.map { it.toString("X2") }.joinToString("") + suffix
+        return prefix + data.map { it.toString("X2") }.reversed().joinToString("") + suffix
     }
 
 }
