@@ -251,7 +251,7 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
 
     fun assembleToMemory(sourceCode: String, memAddr: Int): Pair<Boolean/*Success*/, String/*Message*/> {
         try {
-            val compiled = Assembler.assemble(sourceCode)
+            val compiled = Assembler.assemble(sourceCode, memAddr)
             if (lastMemoryAddress != memAddr) {
                 lastMemoryAddress = memAddr
             } else {

@@ -2,50 +2,156 @@ package me.emu6502.lib6502
 
 import me.emu6502.kotlinutils.*
 import java.io.ByteArrayOutputStream
+import java.io.OutputStream
 import java.lang.NumberFormatException
 
 class Assembler {
+
+    class AssemblerLine(val instruction: Instruction, var operator: String, var assignedMemoryLabel: String?) {
+        fun findAddressMode(): AddressMode? {
+            for((opcode, addrMode) in instruction.opCodeAddrModes) {
+                if(addrMode.parse(operator) != null)
+                    return addrMode
+            }
+            return null
+        }
+
+        fun findOpCode(): Int? {
+            for((opcode, addrMode) in instruction.opCodeAddrModes) {
+                if(addrMode.parse(operator) != null)
+                    return opcode
+            }
+            return instruction.fixedOpCode
+        }
+
+        var relativeAddress: Int? = null
+
+        var referencedAssemblerLine: AssemblerLine? = null
+
+        var resolvedAddressData: UByteArray? = null
+
+        fun isOperatorReferencingMemoryLabel() = instruction.opCodeAddrModes.size > 0 && findOpCode() == null
+
+        fun findAdequateReferenceAddressMode(): AddressMode? {
+            for(mode in arrayOf(AddressMode.ABSOLUTE, AddressMode.ZEROPAGE)) {
+                if (instruction.opCodeAddrModes.any { (_, addrMode) -> addrMode == mode })
+                    return mode
+            }
+            return null
+        }
+
+        fun compile(): UByteArray? {
+            val opCode = findOpCode()
+            if(opCode == null || resolvedAddressData == null) return null
+            return UByteArray(1 + resolvedAddressData!!.size) {i ->
+                if(i == 0) opCode.ubyte else resolvedAddressData!![i-1]
+            }
+        }
+
+        fun expectedSize(): Int? {
+            if(resolvedAddressData != null)
+                return 1 + resolvedAddressData!!.size
+            if(referencedAssemblerLine != null)
+                return 1 + (findAdequateReferenceAddressMode()
+                        ?: throw AssembleException("Unerwartet: Kann erwartete Größe nicht berechnen für: \"$this\"!")).addressBytes
+            return null
+        }
+
+        override fun toString(): String = instruction.name + " " + operator
+    }
+
     companion object {
 
-        fun assemble(code: String): UByteArray {
-            val lines = code.split("\n")
+        fun assemble(code: String, targetMemoryAddress: Int?): UByteArray {
+            val lines = arrayListOf<AssemblerLine>()
+
+            // Basic parsing of source code (assigning of instructions and memory labels to them)
+            var prevMemoryLabel: String? = null
+            for(line in code.split("\n")
+                    .map { if(";" in it) it.split(";")[0] else it }
                     .map { it.trim() }
                     .filter{ !it.startsWith(";") }
-                    .filter{ it.isNotBlank() }
+                    .filter{ it.isNotBlank() }) {
 
-            val binary = ByteArrayOutputStream()
+                if(line.endsWith(":")) {
+                    prevMemoryLabel = line.substring(0, line.length - 1).trim()
+                    continue
+                }
 
-            for(line in lines) {
                 val spacesplit = line.split(' ')
                 val mnemonic = spacesplit[0]
                 val operator = if(spacesplit.size > 1) spacesplit[1] else ""
-                var addr: UShort = 0.ushort
-                var op1: UByte = 0.ubyte
                 val instruction = Instruction.values().firstOrNull {
                     it.name.equals(mnemonic, true)
                 } ?: throw AssembleException("Unbekanntes Mnemonic: $line")
 
-                var compiled = false
-                if(operator == "") {
-                    if(instruction.fixedOpCode != null && instruction.opCodeAddrModes.isEmpty()) {
-                        binary.write(instruction.fixedOpCode)
-                        compiled = true
-                    }
-                }else {
-                    for((opcode, addrMode) in instruction.opCodeAddrModes) {
-                        val parsed = addrMode.parse(operator) ?: continue
-                        binary.write(opcode)
-                        binary.write(parsed.toByteArray())
-                        compiled = true
-                        break
-                    }
-                }
+                lines.add(AssemblerLine(instruction, operator, prevMemoryLabel))
 
-                if(!compiled)
-                    throw AssembleException("Operator falsch oder nicht unterstützt: $line")
+                if(prevMemoryLabel != null)
+                    prevMemoryLabel = null
             }
 
-            return binary.toByteArray().toUByteArray()
+            // Find referenced memory labels
+            for(line in lines) {
+                if(line.isOperatorReferencingMemoryLabel()) {
+                    if(line.findAdequateReferenceAddressMode() != null) {
+                        line.referencedAssemblerLine = lines.firstOrNull { it.assignedMemoryLabel == line.operator }
+                                ?: throw AssembleException("Failed to find memory label ${line.operator}!")
+                    }else
+                        throw AssembleException("Mnemonic ${line.instruction.name} unterstützt kein Memory Label!")
+                }else{
+                    if(line.operator != "") {
+                        line.resolvedAddressData = line.findAddressMode()?.parse(line.operator) ?:
+                                throw AssembleException("Kann Operator nicht verarbeiten: \"$line\"")
+                    }else {
+                        line.resolvedAddressData = UByteArray(0)
+                    }
+                }
+            }
+
+            // Now at least the size of every command should be calculateable
+            var addr = 0
+            for(line in lines) {
+                line.relativeAddress = addr
+                addr += line.expectedSize() ?: throw AssembleException("Unerwartet: Kann Befehlsgröße von \"$line\" nicht ermitteln!")
+            }
+
+            // Calculate remaining (labeled) addresses
+            for(line in lines) {
+                if(line.resolvedAddressData == null) {
+                   if(!line.isOperatorReferencingMemoryLabel())
+                       throw AssembleException("Unerwartet: Operand-Daten von \"$line\" sollten bereits resolved sein!")
+
+                    val addrMode = line.findAdequateReferenceAddressMode()
+
+                    when(addrMode) {
+                        AddressMode.ZEROPAGE -> {
+                            val offset = line.referencedAssemblerLine!!.relativeAddress!! - (line.relativeAddress!! + line.expectedSize()!!)
+                            if(offset < -128 || offset > 127)
+                                throw AssembleException("Label \"${line.referencedAssemblerLine?.assignedMemoryLabel ?: "???"}\" ist nicht von $line mit einem signed Byte erreichbar (Offset: $offset)!")
+                            val indirectData = ByteArray(1) { offset.toByte() }.toUByteArray()
+                            line.operator = AddressMode.ZEROPAGE.toString(indirectData) ?: throw AssembleException("Konnte Adresse für \"$line\" nicht kodieren (Offset: $offset)!")
+                            line.resolvedAddressData = line.findAddressMode()!!.parse(line.operator)
+                        }
+                        AddressMode.ABSOLUTE -> {
+                            if(targetMemoryAddress == null)
+                                throw AssembleException("Sprung zu Absoluter Adresse nicht berechenbar, da Speicherort fehlt!")
+                            line.operator = "$" + (targetMemoryAddress + line.referencedAssemblerLine!!.relativeAddress!!).toString("X4")
+                            line.resolvedAddressData = line.findAddressMode()!!.parse(line.operator)
+                        }
+                        else -> throw AssembleException("Unerwartet: Sprung-Berechnung zu AddressenTyp $addrMode nicht implementiert!")
+                    }
+
+                }
+            }
+
+            // Everything should be find for final compilation now
+            val out = ByteArrayOutputStream()
+            for(line in lines)
+                out.write(line.compile()?.toByteArray()
+                        ?: throw AssembleException("Unerwartet: \"$line\" ist nicht kompilierbar!"))
+
+            return out.toByteArray().toUByteArray()
         }
 
     }

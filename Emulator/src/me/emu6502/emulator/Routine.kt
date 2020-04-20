@@ -35,6 +35,6 @@ enum class Routine(val memoryAddress: UShort, unformattedSourceCode: String) {
             """);
 
     val sourceCode = unformattedSourceCode.trimIndent().replace("€", "$")
-    val data by lazy { Assembler.assemble(sourceCode) }
+    val data by lazy { Assembler.assemble(sourceCode, null) }
 
 }
