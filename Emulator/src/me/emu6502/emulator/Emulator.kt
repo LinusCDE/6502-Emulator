@@ -19,6 +19,7 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
             LAST_ASSEMBLY(0.ushort, 0.ushort, VT100Display.DIM, visible = false),
 
             ZEROPAGE(0x0000.ushort, 0x00FF.ushort, VT100Display.DIM, VT100ForegroundColor.MAGENTA),
+            STACK_POINTER(0.ushort, 0.ushort, VT100Display.DIM, VT100ForegroundColor.BLUE, VT100Display.UNDERSCORE),
             STACK(0x0100.ushort, 0x01FF.ushort, VT100Display.DIM, VT100ForegroundColor.BLUE),
             VECTORS(0xFFFA.ushort, 0xFFFF.ushort, VT100ForegroundColor.RED, VT100Display.DIM)
         }
@@ -110,6 +111,8 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
         val (_, instructionSize) = Disassembler.disassembleVerbose(ubyteArrayOf(mainbus.getData(cpu.PC), mainbus.getData((cpu.PC + 1.ushort).ushort), mainbus.getData((cpu.PC + 2.ushort).ushort)), 0)
         MemoryTag.INSTRUCTION_DATA.memoryStart = (cpu.PC + 1.uint).ushort
         MemoryTag.INSTRUCTION_DATA.memoryEnd = (cpu.PC.int + 1 + (instructionSize - 1)).ushort
+        MemoryTag.STACK_POINTER.memoryStart = (MemoryTag.STACK.memoryStart + cpu.SP - 1.uint).ushort
+        MemoryTag.STACK_POINTER.memoryEnd = (MemoryTag.STACK.memoryStart + cpu.SP).ushort
 
         //ubyteArrayOf(bus.getData(PC), bus.getData((PC + 1.ushort).ushort), bus.getData((PC + 2.ushort).ushort))
 
@@ -135,7 +138,7 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
 
                 builder.append("$" + mainbus.getData(pc.ushort).toString("X2") + if(pc < line + 32) " " else "")
             }
-            writeLine(builder.toString())
+            writeLine(builder.toString().substring(0, builder.toString().length - 1))
             line += 32
         }
         writeLine(VT100Sequence.SET_ATTRIBUTE_MODE.toString(VT100Display.RESET_ALL_ATTRIBUTES) ?: "")
