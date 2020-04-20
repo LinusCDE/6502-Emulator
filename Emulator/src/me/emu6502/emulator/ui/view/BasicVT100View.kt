@@ -156,7 +156,7 @@ class BasicVT100View(val cols: Int, val rows: Int): Canvas() {
                         if(cell.char != null && !cell.char!!.isWhitespace())
                             ctx.fillText(cell.char.toString(), x, y + charHeight)
                         if(cell.cellStyle.underscore)
-                            ctx.fillRect(x, y + charHeight + 2, charWidth + 1, 0.75)
+                            ctx.fillRect(x, y + charHeight + 2, charWidth, 1.0)
                     }
                 }
 
