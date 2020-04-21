@@ -103,6 +103,8 @@ class AssemblerView: View() {
             }
             multiPlainChanges().successionEnds(Duration.ofMillis(250))
                     .subscribe { updateSyntax() } // Update x millis after stopping to write
+
+            controller.mainController.uiHandleAsync { updateSyntax() } // Highlight on init
         })
         bottom = label(controller.statusMessageProperty) {
             tooltip = Tooltip()
@@ -111,7 +113,9 @@ class AssemblerView: View() {
     }
 
     private fun asRegex(addrMode: AddressMode): String {
-        val regex = (if(addrMode.prefix != "") Pattern.quote(addrMode.prefix) else "") + "[A-Fa-f0-9]{" + addrMode.fixedValueLength + "}" + (if(addrMode.suffix != "") Pattern.quote(addrMode.suffix) else "")
+        //val hex = "[A-Fa-f0-9]{" + addrMode.fixedValueLength + "}";
+        val hex = "([A-F0-9]{" + addrMode.fixedValueLength + "}" + "|" + "[a-f0-9]{" + addrMode.fixedValueLength + "})"; // Don't allow case mixing
+        val regex = (if(addrMode.prefix != "") Pattern.quote(addrMode.prefix) else "") + hex + (if(addrMode.suffix != "") Pattern.quote(addrMode.suffix) else "")
         return "($regex)"
     }
 
@@ -155,6 +159,5 @@ class AssemblerView: View() {
 
     init {
         importStylesheet(AssemblerView::class.java.getResource("assembly-view.css").toExternalForm())
-        println(AddressMode.values().map { (if(it.prefix != "") Pattern.quote(it.prefix) else "") + "[A-Za-z0-9]{" + it.fixedValueLength + "}" + (if(it.suffix != "") Pattern.quote(it.suffix) else "") }.joinToString("|"))
     }
 }
