@@ -109,9 +109,8 @@ class AssemblerView: View() {
         }
     }
 
-    val MNEMONIC_PATTERN = "([^\n]" + Instruction.values().map { "\\b" + it.name }.joinToString("|") + ")"
+    val MNEMONIC_PATTERN = "([^\n]" + Instruction.values().map { "\\b${it.name}\\b" }.joinToString("|") + ")"
     val MEMORYLABEL_PATTERN = "([^\n][a-zA-Z0-9_-]*:)"
-    //val OPERATOR_PATTERN = "([^\n]\\\$[A-Za-z0-9]{4})"
     val OPERATOR_PATTERN = "([^\n]" + AddressMode.values().map { (if(it.prefix != "") Pattern.quote(it.prefix) else "") + "[A-Fa-f0-9]{" + it.fixedValueLength + "}" + (if(it.suffix != "") Pattern.quote(it.suffix) else "") }.map { "($it)" }.joinToString("|") + ")"
     val COMMENT_PATTERN = "(;(.*))"
 
