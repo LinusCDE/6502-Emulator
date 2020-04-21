@@ -1,0 +1,20 @@
+.mnemonic {
+    -fx-fill: darkblue;
+    -fx-font-weight: bold;
+}
+
+.operator {
+    -fx-fill: darkorange;
+}
+
+.comment {
+    -fx-fill: limegreen;
+}
+
+.memory-label {
+    -fx-fill: indianred;
+}
+
+.paragraph-box:has-caret {
+    -fx-background-color: #f6f6f6;
+}

@@ -71,11 +71,22 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
       <artifactId>tornadofx</artifactId>
       <version>1.7.20</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.fxmisc.richtext</groupId>
+      <artifactId>richtextfx</artifactId>
+      <version>0.10.5</version>
+    </dependency>
   </dependencies>
-  
-  
+
+
   <build>
     <sourceDirectory>src</sourceDirectory>
+    <resources>
+      <resource>
+        <directory>res</directory>
+      </resource>
+    </resources>
     
     <plugins>
       <!-- Compile Java and Kotlin code -->
