@@ -19,6 +19,7 @@ import java.time.Duration
 import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import me.emu6502.lib6502.AddressMode.*
 
 
 class AssemblerView: View() {
@@ -109,14 +110,19 @@ class AssemblerView: View() {
         }
     }
 
-    val MNEMONIC_PATTERN = "([^\n]" + Instruction.values().map { "\\b${it.name}\\b" }.joinToString("|") + ")"
+    private fun asRegex(addrMode: AddressMode): String {
+        val regex = (if(addrMode.prefix != "") Pattern.quote(addrMode.prefix) else "") + "[A-Fa-f0-9]{" + addrMode.fixedValueLength + "}" + (if(addrMode.suffix != "") Pattern.quote(addrMode.suffix) else "")
+        return "($regex)"
+    }
+
+    val MNEMONIC_PATTERN = "(" + Instruction.values().map { "\\b${it.name}\\b" }.joinToString("|") + ")"
     val MEMORYLABEL_PATTERN = "([^\n][a-zA-Z0-9_-]*:)"
-    val OPERATOR_PATTERN = "([^\n]" + AddressMode.values().map { (if(it.prefix != "") Pattern.quote(it.prefix) else "") + "[A-Fa-f0-9]{" + it.fixedValueLength + "}" + (if(it.suffix != "") Pattern.quote(it.suffix) else "") }.map { "($it)" }.joinToString("|") + ")"
+    val OPERATOR_PATTERN = "([^\n]" + AddressMode.values().map { asRegex(it) }.joinToString("|") + ")"
     val COMMENT_PATTERN = "(;(.*))"
 
     val PATTERN = Pattern.compile(
-            "(?<MNEMONIC>$MNEMONIC_PATTERN)" +
-            "|(?<MEMORYLABEL>$MEMORYLABEL_PATTERN)" +
+            "(?<MEMORYLABEL>$MEMORYLABEL_PATTERN)" +
+            "|(?<MNEMONIC>$MNEMONIC_PATTERN)" +
             "|(?<OPERATOR>$OPERATOR_PATTERN)" +
             "|(?<COMMENT>$COMMENT_PATTERN)"
     )
