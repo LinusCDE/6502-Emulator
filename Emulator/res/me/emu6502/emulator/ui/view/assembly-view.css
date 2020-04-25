@@ -15,6 +15,6 @@
     -fx-fill: indianred;
 }
 
-.paragraph-box:has-caret {
+/*.paragraph-box:has-caret {
     -fx-background-color: #f6f6f6;
-}
+}*/

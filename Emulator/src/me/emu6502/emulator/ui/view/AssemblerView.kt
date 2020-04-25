@@ -1,11 +1,16 @@
 package me.emu6502.emulator.ui.view
 
 import javafx.application.Platform
+import javafx.css.converter.PaintConverter
 import javafx.geometry.Pos
 import javafx.scene.Parent
 import javafx.scene.control.Tooltip
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
+import javafx.scene.layout.Background
+import javafx.scene.layout.BackgroundFill
+import javafx.scene.paint.Color
+import javafx.scene.paint.Paint
 import me.emu6502.emulator.ui.controller.AssemblerController
 import me.emu6502.lib6502.AddressMode
 import me.emu6502.lib6502.Instruction

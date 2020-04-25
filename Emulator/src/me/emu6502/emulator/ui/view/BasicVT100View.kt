@@ -32,9 +32,9 @@ class BasicVT100View(val cols: Int, val rows: Int): Canvas() {
         CYAN(182f, 94f, 67f, 182f, 94f, 42f, 182f, 94f, 75f),
         WHITE(0f, 0f, 85f, 0f, 0f, 66f, 0f, 0f, 99f);
 
-        val default = java.awt.Color.getHSBColor(defaultH / 360, defaultS / 100, defaultV / 100)
-        val dim = java.awt.Color.getHSBColor(dimH / 360, dimS / 100, dimV / 100)
-        val bright = java.awt.Color.getHSBColor(brightH / 360, brightS / 100, brightV / 100)
+        val default = java.awt.Color.getHSBColor(defaultH / 360, defaultS / 100, 1 - defaultV / 100)
+        val dim = java.awt.Color.getHSBColor(dimH / 360, dimS / 100, 1 - dimV / 100)
+        val bright = java.awt.Color.getHSBColor(brightH / 360, brightS / 100, 1 - brightV / 100)
 
         val defaultHexCode by lazy { "#" + default.rgb.and(0xFFFFFF).toString("X6") }
         val dimHexCode by lazy { "#" + dim.rgb.and(0xFFFFFF).toString("X6") }

@@ -1,0 +1,13 @@
+.root {
+    -fx-base: rgba(60, 63, 65, 255); // dark
+    /* -fx-base: #110216; */
+}
+
+.code-area {
+    -fx-background-color: rgba(60, 63, 65, 255);
+}
+
+.lineno {
+    -fx-background-color: rgba(60, 63, 65, 255);
+    -fx-text-fill: #dddddd;
+}
