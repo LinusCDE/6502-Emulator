@@ -1,5 +1,7 @@
 # 6502-Emulator
 
+![CI](https://github.com/LinusCDE/6502-Emulator/workflows/CI/badge.svg)
+
 This project is a port of [bomberman2910](https://github.com/bomberman2910)'s [work](https://github.com/bomberman2910/6502Tests) with his aid.
 
 The Lib6502 module is a direct port from his repo and Emulator is based on the emu6520 module and has an additional GUI added to it.
