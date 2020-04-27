@@ -1,11 +1,9 @@
 package me.emu6502.emulator.ui.view
 
-import javafx.css.converter.PaintConverter
 import javafx.scene.Parent
-import javafx.scene.paint.Color
+import me.emu6502.emulator.darkModeEnabled
 import me.emu6502.emulator.ui.CommandInfo
 import me.emu6502.emulator.ui.controller.MainController
-import org.aerofx.AeroFX
 import tornadofx.*
 
 class MainView: View(title = "6502-Emulator") {
@@ -34,7 +32,7 @@ class MainView: View(title = "6502-Emulator") {
     init {
         //AeroFX.style()
         //Material
-        if(controller.darkMode)
+        if(darkModeEnabled)
             importStylesheet(MainView::class.java.getResource("dark-style.css").toExternalForm())
     }
 }

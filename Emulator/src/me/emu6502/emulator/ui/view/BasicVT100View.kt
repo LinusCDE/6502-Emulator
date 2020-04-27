@@ -14,15 +14,15 @@ import me.emu6502.kotlinutils.vt100.VT100BackgroundColor
 import me.emu6502.kotlinutils.vt100.VT100ForegroundColor
 import tornadofx.onChange
 
-class BasicVT100View(val cols: Int, val rows: Int, val darkMode: Boolean = false): Canvas() {
+class BasicVT100View(val cols: Int, val rows: Int): Canvas() {
 
     companion object {
         const val BLINK_DURATION = 1000 // ms
     }
 
-    enum class TermColor(defaultH: Float, defaultS: Float, defaultV: Float,
-                      dimH: Float, dimS: Float, dimV: Float,
-                      brightH: Float, brightS: Float, brightV: Float) {
+    enum class TermColor(private val defaultH: Float, private val defaultS: Float, private val defaultV: Float,
+                         private val dimH: Float, private val dimS: Float, private val dimV: Float,
+                         private val brightH: Float, private val brightS: Float, private val brightV: Float) {
 
         BLACK(0f, 0f, 15f, 0f, 0f, 1f, 0f, 0f, 28f),
         RED(0f, 94f, 67f, 0f, 94f, 42f, 0f, 94f, 75f),
