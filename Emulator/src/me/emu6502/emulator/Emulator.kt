@@ -37,6 +37,7 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
     lateinit var screen: Screen
     lateinit var charrom: ROM
     lateinit var textscreen: TextScreen
+    lateinit var pia: PIA
 
     data class MemoryColorSet(var foregroundColor: VT100ForegroundColor?, var backgroundColor: VT100BackgroundColor?,
                               var display: VT100Display?)
@@ -71,6 +72,9 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
 
         /*textscreen = TextScreen(40, 25, 0xD004.ushort).apply { reset() }
         mainbus.devices.add(textscreen)*/
+
+        pia = PIA(cpu, 0xD010.ushort)
+        mainbus.devices.add(pia)
 
         cpu = CPU(mainbus).apply { PC = 0x0200.ushort }
 
