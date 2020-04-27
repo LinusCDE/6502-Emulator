@@ -5,8 +5,6 @@ import kotlin.math.log2
 
 class CPU(val bus: Bus) {
 
-    //will not (yet) support decimal mode
-
     var cycles = 0
 
     var PC: UShort = ((bus.getData(0xFFFD.ushort) shiftLeft 8) + bus.getData(0xFFFC.ushort)).ushort
@@ -23,6 +21,14 @@ class CPU(val bus: Bus) {
     //region Helpers
     companion object {
         fun checkBit(value: UByte, bit: Int): Boolean = ((value shiftLeft (7 - bit)) shiftRight 7) == 1.uint
+
+        fun BCDToDec(bcd: UByte): UByte = (10 * (bcd.int shr 4) + (bcd.int and 0xF)).ubyte
+
+        fun DecToBCD(dec: UByte): UByte {
+            var dec = dec
+            if(dec > 99.ubyte) dec = (dec.int % 100).ubyte
+            return (((dec.int / 10) shl 4) or (dec.int % 10)).ubyte
+        }
     }
 
     override fun toString(): String {
@@ -75,7 +81,7 @@ class CPU(val bus: Bus) {
     //endregion
 
     //region Interrupt routines
-    fun handleIRQ() {
+    private fun handleIRQ() {
         pushToStack(BitConverter.GetBytes(PC)[1])
         pushToStack(BitConverter.GetBytes(PC)[0])
         pushToStack(SR)
@@ -84,7 +90,7 @@ class CPU(val bus: Bus) {
         cycles = 8
     }
 
-    fun handleNMI() {
+    private fun handleNMI() {
         pushToStack(BitConverter.GetBytes(PC)[1])
         pushToStack(BitConverter.GetBytes(PC)[0])
         pushToStack(SR)
@@ -135,12 +141,21 @@ class CPU(val bus: Bus) {
 
     //region Operations with multiple addressing modes (except store operations)
     private fun ADC(value: UByte): Unit {
-        val sum = (A + value + (if (checkFlag(EFlag.CAR)) 1 else 0).ushort).ushort
-        setFlag(EFlag.OVR, checkBit(A, 7) === checkBit(value, 7) && checkBit(A, 7) !== checkBit(sum.ubyte, 7))
-        setFlag(EFlag.CAR, sum > 255.ushort || sum < 0.ushort)
-        setFlag(EFlag.NEG, checkBit(sum.ubyte, 7))
-        setFlag(EFlag.ZER, sum.toInt() == 0)
-        A = sum.ubyte
+        if(!checkFlag(EFlag.DEC)) {
+            val sum = (A + value + (if (checkFlag(EFlag.CAR)) 1 else 0).ushort).ushort
+            setFlag(EFlag.OVR, checkBit(A, 7) === checkBit(value, 7) && checkBit(A, 7) !== checkBit(sum.ubyte, 7))
+            setFlag(EFlag.CAR, sum > 255.ushort || sum < 0.ushort)
+            setFlag(EFlag.NEG, checkBit(sum.ubyte, 7))
+            setFlag(EFlag.ZER, sum.toInt() == 0)
+            A = sum.ubyte
+        }else {
+            val sum: Short = (BCDToDec(A) + BCDToDec(value) + (if(checkFlag(EFlag.CAR)) 1 else 0).uint).toShort()
+            setFlag(EFlag.CAR, sum > 99)
+            setFlag(EFlag.ZER, DecToBCD(sum.toUByte()) == 0.ubyte)
+            setFlag(EFlag.OVR, testForOverflow(sum.toUShort()))
+            setFlag(EFlag.NEG, checkBit(DecToBCD(sum.toUByte()), 7))
+            A = DecToBCD(sum.toUByte())
+        }
     }
 
     private fun AND(value: UByte) {
@@ -305,15 +320,31 @@ class CPU(val bus: Bus) {
         return value
     }
 
-    private fun SBC(value: UByte) = ADC(value.inv())
+    private fun SBC(value: UByte) {
+        if(checkFlag(EFlag.DEC)) {
+            var sum: Short = (BCDToDec(A) - BCDToDec(value) - (if(checkFlag(EFlag.CAR)) 0 else 1).uint).toShort()
+            if(sum < 0) {
+                sum = (sum + 100).toShort()
+                setFlag(EFlag.CAR, false)
+            }else {
+                setFlag(EFlag.CAR, true)
+            }
+            setFlag(EFlag.OVR, testForOverflow(sum.toUShort()))
+            setFlag(EFlag.NEG, checkBit(DecToBCD(sum.toUByte()), 7))
+            setFlag(EFlag.ZER, DecToBCD(sum.toUByte()) == 0.ubyte)
+            A = DecToBCD(sum.toUByte())
+        }else {
+            ADC(value.inv())
+        }
+    }
     //endregion
 
     //region Execution
     fun exec() {
-        if (!checkFlag(EFlag.IRQ) && IRQ)
-            handleIRQ()
-        if (NMI)
+        if (NMI && cycles == 0)
             handleNMI()
+        if (!checkFlag(EFlag.IRQ) && IRQ && cycles == 0)
+            handleIRQ()
 
         if (cycles == 0) {
             val instruction = bus.getData(PC)
