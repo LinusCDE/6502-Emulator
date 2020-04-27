@@ -4,6 +4,8 @@ import me.emu6502.emulator.ui.EmulatorApp
 import tornadofx.launch
 import kotlin.system.exitProcess
 
+var darkModeEnabled = false;
+
 fun main(args: Array<String>) {
     if(args.contains("--cli") || args.contains("-i")) {
         // Launch in console
@@ -21,8 +23,13 @@ fun main(args: Array<String>) {
             emulator.executeDebuggerCommand(Console.readLine("> "))
     }
 
+    if(args.contains("-d") || args.contains("--dark-mode"))
+        darkModeEnabled = true;
+
     // Launch GUI
     Console.writeLine("Launching GUI...")
+    if(!darkModeEnabled)
+        Console.writeLine("Heads up! You can use a dark mode. For that you need to pass the -d or --dark-mode flag.")
     Console.writeLine("To use the console mode, pass the --cli flag.")
     launch<EmulatorApp>(args)
     exitProcess(0)

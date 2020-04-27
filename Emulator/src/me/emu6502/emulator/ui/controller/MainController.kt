@@ -1,6 +1,7 @@
 package me.emu6502.emulator.ui.controller
 
 import javafx.application.Platform
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.embed.swing.SwingFXUtils
@@ -12,11 +13,14 @@ import me.emu6502.emulator.ui.CommandInfo
 import tornadofx.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
+import me.emu6502.emulator.darkModeEnabled;
 
 class MainController: Controller() {
     val commands = FXCollections.observableArrayList<CommandInfo>()
     val screenImageProperty = SimpleObjectProperty<Image>()
     var screenImage by screenImageProperty
+    private val darkModeProperty = SimpleBooleanProperty(darkModeEnabled)
+    val darkMode by darkModeProperty;
 
     val console: ConsoleController by inject()
 

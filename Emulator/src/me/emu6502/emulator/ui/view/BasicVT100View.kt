@@ -8,12 +8,13 @@ import javafx.scene.paint.Paint
 import javafx.scene.text.Font
 import javafx.scene.text.Text
 import me.emu6502.emulator.BasicVT100Engine
+import me.emu6502.emulator.darkModeEnabled
 import me.emu6502.kotlinutils.vt100.VT100Attribute
 import me.emu6502.kotlinutils.vt100.VT100BackgroundColor
 import me.emu6502.kotlinutils.vt100.VT100ForegroundColor
 import tornadofx.onChange
 
-class BasicVT100View(val cols: Int, val rows: Int): Canvas() {
+class BasicVT100View(val cols: Int, val rows: Int, val darkMode: Boolean = false): Canvas() {
 
     companion object {
         const val BLINK_DURATION = 1000 // ms
@@ -32,9 +33,9 @@ class BasicVT100View(val cols: Int, val rows: Int): Canvas() {
         CYAN(182f, 94f, 67f, 182f, 94f, 42f, 182f, 94f, 75f),
         WHITE(0f, 0f, 85f, 0f, 0f, 66f, 0f, 0f, 99f);
 
-        val default = java.awt.Color.getHSBColor(defaultH / 360, defaultS / 100, 1 - defaultV / 100)
-        val dim = java.awt.Color.getHSBColor(dimH / 360, dimS / 100, 1 - dimV / 100)
-        val bright = java.awt.Color.getHSBColor(brightH / 360, brightS / 100, 1 - brightV / 100)
+        val default = java.awt.Color.getHSBColor(defaultH / 360, defaultS / 100, (if(darkModeEnabled) 1 - defaultV / 100 else  defaultV / 100))
+        val dim = java.awt.Color.getHSBColor(dimH / 360, dimS / 100, (if(darkModeEnabled) 1 - dimV / 100 else  dimV / 100))
+        val bright = java.awt.Color.getHSBColor(brightH / 360, brightS / 100, (if(darkModeEnabled) 1 - brightV / 100 else  brightV / 100))
 
         val defaultHexCode by lazy { "#" + default.rgb.and(0xFFFFFF).toString("X6") }
         val dimHexCode by lazy { "#" + dim.rgb.and(0xFFFFFF).toString("X6") }

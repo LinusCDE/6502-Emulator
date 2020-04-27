@@ -34,6 +34,7 @@ class MainView: View(title = "6502-Emulator") {
     init {
         //AeroFX.style()
         //Material
-        importStylesheet(MainView::class.java.getResource("style.css").toExternalForm())
+        if(controller.darkMode)
+            importStylesheet(MainView::class.java.getResource("dark-style.css").toExternalForm())
     }
 }
