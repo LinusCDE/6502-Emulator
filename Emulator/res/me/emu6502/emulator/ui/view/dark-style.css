@@ -1,13 +1,37 @@
 .root {
-    -fx-base: rgba(60, 63, 65, 255); // dark
+    /*-fx-base: rgba(60, 63, 65, 255); // dark*/
+    -fx-base: #292929;
     /* -fx-base: #110216; */
 }
 
 .code-area {
-    -fx-background-color: rgba(60, 63, 65, 255);
+    -fx-background-color: #292929 !important;
+}
+
+.code-area * {
+    -fx-fill: #dedede !important;
 }
 
 .lineno {
-    -fx-background-color: rgba(60, 63, 65, 255);
-    -fx-text-fill: #dddddd;
+    -fx-background-color: #292929 !important;
+    -fx-text-fill: #dddddd !important;
+}
+
+.mnemonic {
+    -fx-fill: #3b84bb !important;
+    /*-fx-fill: #171a62;*/
+    -fx-font-weight: bold !important;
+}
+
+.operator {
+    /*-fx-fill: #d6a376;*/
+    -fx-fill: #e8c16f !important;
+}
+
+.comment {
+    -fx-fill: #a3a3a3 !important;
+}
+
+.memory-label {
+    -fx-font-weight: bold !important;
 }

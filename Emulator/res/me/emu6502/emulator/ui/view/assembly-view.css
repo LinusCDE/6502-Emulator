@@ -1,18 +1,19 @@
 .mnemonic {
-    -fx-fill: darkblue;
+    -fx-fill: #3509d6;
+    /*-fx-fill: #171a62;*/
     -fx-font-weight: bold;
 }
 
 .operator {
-    -fx-fill: darkorange;
+    -fx-fill: #d66a09;
 }
 
 .comment {
-    -fx-fill: limegreen;
+    -fx-fill: #626262;
 }
 
 .memory-label {
-    -fx-fill: indianred;
+    -fx-font-weight: bold;
 }
 
 .lineno {
