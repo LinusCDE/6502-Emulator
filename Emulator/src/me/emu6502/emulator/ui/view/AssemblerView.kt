@@ -6,6 +6,7 @@ import javafx.scene.Parent
 import javafx.scene.control.Tooltip
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
+import javafx.stage.FileChooser
 import me.emu6502.emulator.ui.controller.AssemblerController
 import me.emu6502.lib6502.AddressMode
 import me.emu6502.lib6502.Instruction
@@ -15,6 +16,8 @@ import org.fxmisc.richtext.LineNumberFactory
 import org.fxmisc.richtext.model.StyleSpans
 import org.fxmisc.richtext.model.StyleSpansBuilder
 import tornadofx.*
+import java.io.File
+import java.lang.IndexOutOfBoundsException
 import java.time.Duration
 import java.util.*
 import java.util.regex.Matcher
@@ -25,31 +28,80 @@ class AssemblerView: View() {
 
     val controller: AssemblerController by inject()
 
+    val asmFileChooser = FileChooser().apply {
+        extensionFilters.setAll(FileChooser.ExtensionFilter("Assembly Source Code für 6502 (.s, .asm)", "*.s", "*.asm"))
+    }
+
+    val binaryFileChooser = FileChooser().apply {
+        extensionFilters.setAll(FileChooser.ExtensionFilter("Beliebige Binär-Datei", "*.bin", "*.hex", "*"))
+    }
+
+    var lastFile: File? = null
+
     override val root: Parent = borderpane {
-        top = borderpane {
-            left = hbox {
-                alignment = Pos.CENTER_LEFT
-                label("Ziel-Adresse: ")
-                textfield(controller.memoryAddressProperty) {
-                    style {
-                        fontFamily = "monospaced"
-                        prefColumnCount = 5
+        top = vbox {
+            menubar {
+                menu("Assembly") {
+                    item("Laden...") {
+                        action {
+                            lastFile = asmFileChooser.showOpenDialog(primaryStage)
+                            controller.onLoadSourcePressed(lastFile)
+                        }
+                    }
+                    item("Speichern") {
+                        action {
+                            if(lastFile == null)
+                                lastFile = asmFileChooser.showSaveDialog(primaryStage)
+                            controller.onSaveSourcePressed(lastFile)
+                        }
+                    }
+                    item("Speichern unter...") {
+                        action {
+                            lastFile = asmFileChooser.showSaveDialog(primaryStage)
+                            controller.onSaveSourcePressed(lastFile)
+                        }
+                    }
+                }
+
+                menu("Binär") {
+                    item("Assemblieren nach...") {
+                        action {
+                            val file: File? = binaryFileChooser.showSaveDialog(primaryStage)
+                            controller.onSaveAssemblyToDisk(file)
+                        }
+                    }
+                    item("Disassemblieren von...") {
+                        action {
+                            val file: File? = binaryFileChooser.showOpenDialog(primaryStage)
+                            controller.onDisassemblePressed(file)
+                        }
+                    }
+                    separator()
+                    item("In Speicher laden von...") {
+                        action {
+                            val file: File? = binaryFileChooser.showOpenDialog(primaryStage)
+                            controller.onLoadBinaryToMemoryPressed(file)
+                        }
                     }
                 }
             }
-            right = button("Assemble") {
-                action { controller.onAssembleButtonPressed() }
+            borderpane {
+                left = hbox {
+                    alignment = Pos.CENTER_LEFT
+                    label("Ziel-Adresse: ")
+                    textfield(controller.memoryAddressProperty) {
+                        style {
+                            fontFamily = "monospaced"
+                            prefColumnCount = 5
+                        }
+                    }
+                }
+                right = button("Assemble") {
+                    action { controller.onAssembleButtonPressed() }
+                }
             }
         }
         center = VirtualizedScrollPane(CodeArea().apply {
-            controller.sourceCodeProperty.onChange {
-                if(it != text)
-                    replaceText(it)
-            }
-            textProperty().onChange { controller.sourceCode = it }
-            replaceText(controller.sourceCode)
-            setStyleClass(0, 10, "keyword")
-
             sceneProperty().onChange {
                 it?.stylesheets?.add(AssemblerView::class.java.getResource("assembly-view.css").toExternalForm())
             }
