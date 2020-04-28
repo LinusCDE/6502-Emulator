@@ -95,41 +95,10 @@ class AssemblerController: Controller() {
         if(file == null)
             return
 
-        val bytes = file.readBytes().toUByteArray()
-        val disassembled = StringBuilder()
-        var i = 0
-        var rawDataCounter = 0
-        var instructionCounter = 0
-        while(i < bytes.size) {
-            val (str, additionalSize) = Disassembler.disassembleVerbose(bytes, i)
-            if(str.startsWith("Data ")) {
-                var label = rawDataCounter.toString()
-                rawDataCounter++
-                while(label.length < 3)
-                    label = "0$label"
-                label = "_raw$label"
-                disassembled.append(".BYTE $label ${str.replaceFirst("Data ", "")}")
-                disassembled.append(System.lineSeparator())
-            }else {
-                instructionCounter++
-                disassembled.append(str)
-                disassembled.append(System.lineSeparator())
-            }
+        sourceCode = Disassembler.disassembleFully(file.readBytes().toUByteArray())
+                .joinToString(System.lineSeparator())
 
-            i += 1 + additionalSize
-        }
-
-        sourceCode = disassembled.toString()
-
-        if(instructionCounter > 0 && rawDataCounter == 0)
-            statusMessage = "Disassembled: $instructionCounter instructions"
-        else if(instructionCounter > 0 && rawDataCounter > 0)
-            statusMessage = "Disassembled: $instructionCounter instructions und $rawDataCounter unbekannte Bytes"
-        else if(instructionCounter == 0 && rawDataCounter > 0)
-            statusMessage = "Disassembled: $rawDataCounter unbekannte Bytes"
-
-        if(rawDataCounter > instructionCounter)
-            statusMessage += " (Ist dies Assembly Source?)"
+        statusMessage = "Disassembliert"
 
         // Remove highligted on data in memory
         if(Emulator.Companion.MemoryTag.LAST_ASSEMBLY.visible) {
