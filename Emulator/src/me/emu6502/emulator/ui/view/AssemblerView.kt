@@ -174,6 +174,8 @@ class AssemblerView: View() {
     }
 
     private fun asRegex(addrMode: AddressMode): String {
+        if(addrMode == AddressMode.ACCUMULATOR)
+            return "\\bA\\b"
         //val hex = "[A-Fa-f0-9]{" + addrMode.fixedValueLength + "}";
         val hex = "([A-F0-9]{" + addrMode.fixedValueLength + "}" + "|" + "[a-f0-9]{" + addrMode.fixedValueLength + "})"; // Don't allow case mixing
         val regex = (if(addrMode.prefix != "") Pattern.quote(addrMode.prefix) else "") + hex + (if(addrMode.suffix != "") Pattern.quote(addrMode.suffix) else "")
