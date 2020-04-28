@@ -1,21 +1,25 @@
 package me.emu6502.lib6502.enhancedassembler
 
-import me.emu6502.kotlinutils.int
-import me.emu6502.kotlinutils.plusSigned
-import me.emu6502.kotlinutils.toString
-import me.emu6502.kotlinutils.ushort
+import me.emu6502.kotlinutils.*
+import me.emu6502.lib6502.AddressMode
 import me.emu6502.lib6502.AssembleException
 import me.emu6502.lib6502.Assembler
+import me.emu6502.lib6502.Instruction
+import me.emu6502.lib6502.Instruction.*
+import java.io.ByteArrayOutputStream
 import java.util.regex.Pattern
 
 class EnhancedAssembler {
 
     companion object {
-        fun assemble(code: String) {
+        private val BRANCH_INSTRUCTIONS = arrayOf(BCC, BCS, BEQ, BMI, BNE, BPL, BVC, BVS)
+        private val JUMP_INSTRUCTIONS = arrayOf(JMP, JSR)
+
+        fun assemble(code: String): UByteArray {
             // Get codelines
             val lines = (if ('\n' in code) code.split('\n') else listOf(code))
                     .map { CodeLine(it) }
-                    .filter { it isType CodeLine.Companion.LineType.COMMENT } // Remove comment lines
+                    .filter { it.type != CodeLine.Companion.LineType.COMMENT } // Remove comment lines
 
             // Remove in-line comments
             for (line in lines)
@@ -126,9 +130,41 @@ class EnhancedAssembler {
                 byteCodes.add(bc)
             }
 
-            // Weiter hier
-            // https://github.com/bomberman2910/6502Tests/blob/26a5cfdbd4e11cbce7f88a528827f88469149999/asm6502/Program.cs#L182
+            for(data in dataValues) {
+                for(bc in byteCodes.filter { it.label == data.label }) {
+                    bc.code[1] = BitConverter.GetBytes(pc)[0];
+                    bc.code[2] = BitConverter.GetBytes(pc)[1];
+                    println("Data ${data.label} is used at ${pc.toString("X4")}")
+                }
 
+                data.position = pc
+                data.label = ""
+                byteCodes.add(data)
+                pc = pc plusSigned data.code.size
+            }
+
+            for(bc in byteCodes.filter { it.label != "" }) {
+                val instr = Instruction.find(bc.code[0].int)
+                val addrMode = instr?.findAddressMode(bc.code[0].int)
+
+                if(instr in BRANCH_INSTRUCTIONS && addrMode == AddressMode.ZEROPAGE) {
+                    bc.code[1] = if(labelIndexes[bc.label]!! >= bc.position.int)
+                        (labelIndexes[bc.label]!! - bc.position.int - 2).ubyte
+                    else
+                        (0xFE - (bc.position.int - labelIndexes[bc.label]!!)).ubyte
+
+                } else if(instr in JUMP_INSTRUCTIONS && (addrMode == AddressMode.ABSOLUTE || addrMode == AddressMode.INDIRECT)) {
+                    bc.code[1] = BitConverter.GetBytes(labelIndexes[bc.label]!!.ushort)[0]
+                    bc.code[2] = BitConverter.GetBytes(labelIndexes[bc.label]!!.ushort)[1]
+                }
+
+            }
+
+            val bOut = ByteArrayOutputStream()
+            for(bc in byteCodes)
+                bOut.write(bc.code.toByteArray())
+
+            return bOut.toByteArray().toUByteArray()
         }
     }
 

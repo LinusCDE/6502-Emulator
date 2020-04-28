@@ -4,6 +4,7 @@ import me.emu6502.kotlinutils.*
 import me.emu6502.lib6502.*
 import java.io.File
 import me.emu6502.kotlinutils.vt100.*
+import me.emu6502.lib6502.enhancedassembler.EnhancedAssembler
 import java.lang.StringBuilder
 import kotlin.system.exitProcess
 
@@ -258,7 +259,8 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
 
     fun assembleToMemory(sourceCode: String, memAddr: Int): Pair<Boolean/*Success*/, String/*Message*/> {
         try {
-            val compiled = Assembler.assemble(sourceCode, memAddr)
+            //val compiled = Assembler.assemble(sourceCode, memAddr)
+            val compiled = EnhancedAssembler.assemble(sourceCode)
             if (lastMemoryAddress != memAddr) {
                 lastMemoryAddress = memAddr
             } else {

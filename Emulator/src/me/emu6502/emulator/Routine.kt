@@ -1,7 +1,7 @@
 package me.emu6502.emulator
 
 import me.emu6502.kotlinutils.ushort
-import me.emu6502.lib6502.Assembler
+import me.emu6502.lib6502.enhancedassembler.EnhancedAssembler
 
 enum class Routine(val memoryAddress: UShort, unformattedSourceCode: String) {
 
@@ -35,6 +35,6 @@ enum class Routine(val memoryAddress: UShort, unformattedSourceCode: String) {
             """);
 
     val sourceCode = unformattedSourceCode.trimIndent().replace("€", "$")
-    val data by lazy { Assembler.assemble(sourceCode, null) }
+    val data by lazy { EnhancedAssembler.assemble(sourceCode) }
 
 }
