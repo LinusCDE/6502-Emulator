@@ -35,3 +35,7 @@
 .memory-label {
     -fx-font-weight: bold !important;
 }
+
+.code-area .caret {
+    -fx-stroke: #fdfdfd !important;
+}
