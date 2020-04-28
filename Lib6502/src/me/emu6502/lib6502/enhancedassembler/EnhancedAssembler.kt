@@ -33,7 +33,7 @@ class EnhancedAssembler {
 
             val dataValues = lines
                     .filter { it isType CodeLine.Companion.LineType.DIRECTIVE }
-                    .filter { it.line.contains("ORG", true) }
+                    .filter { ! it.line.contains("ORG", true) }
                     .map { ByteCode.parseData(it.line) }
                     .toList()
 
