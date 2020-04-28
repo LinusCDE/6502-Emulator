@@ -86,7 +86,7 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
     private fun setUShortOrComplain(cmdArgs: List<String>, usage: String = "", callback: ((value: UShort) -> Unit)) {
         var value: UShort
         try {
-            value = cmdArgs[0].toInt(16).ushort
+            value = cmdArgs[0].trim('$').toInt(16).ushort
         }catch (e: Exception) {
             // Number not parsable or argument missing
             reportError("Fehlerhafte Eingabe!${if(usage != "") "\nUsage: $usage" else ""}")
@@ -98,7 +98,7 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
     private fun setUByteOrComplain(cmdArgs: List<String>, usage: String = "", callback: ((value: UByte) -> Unit)) {
         var value: UByte
         try {
-            value = cmdArgs[0].toInt(16).ubyte
+            value = cmdArgs[0].trim('$').toInt(16).ubyte
         }catch (e: Exception) {
             // Number not parsable or argument missing
             reportError("Fehlerhafte Eingabe!${if(usage != "") "\nUsage: $usage" else ""}")
