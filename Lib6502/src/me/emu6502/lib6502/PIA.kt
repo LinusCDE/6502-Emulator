@@ -21,7 +21,7 @@ class PIA(private val cpu: CPU, position: UShort): Device(position, position plu
         set(value) {
             if(outa) return
             _porta = value
-            _rdya = true
+            rdya = true
         }
 
     var _portb = 0x00.ubyte
@@ -34,7 +34,7 @@ class PIA(private val cpu: CPU, position: UShort): Device(position, position plu
         set(value) {
             if(outb) return
             _portb = value
-            _rdyb = true
+            rdyb = true
         }
 
     var _rdya = false
@@ -43,7 +43,7 @@ class PIA(private val cpu: CPU, position: UShort): Device(position, position plu
         set(value) {
             if(outa) return
             _rdya = value
-            if(irq) cpu.IRQ = true
+            if(irq) cpu.IRQ = _rdya
         }
     var _rdyb = false
     var rdyb: Boolean
@@ -51,7 +51,7 @@ class PIA(private val cpu: CPU, position: UShort): Device(position, position plu
         set(value) {
             if(outb) return
             _rdyb = value
-            if(irq) cpu.IRQ = true
+            if(irq) cpu.IRQ = _rdyb
         }
 
     fun inspectPorta() = _porta
@@ -106,4 +106,14 @@ class PIA(private val cpu: CPU, position: UShort): Device(position, position plu
     }
 
     override fun performClockAction() { }
+
+    fun reset() {
+        _porta = 0.ubyte
+        _portb = 0.ubyte
+        outa = false
+        outb = false
+        _rdya = false
+        _rdyb = false
+        irq = false
+    }
 }

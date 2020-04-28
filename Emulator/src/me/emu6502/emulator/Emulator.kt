@@ -5,6 +5,7 @@ import me.emu6502.lib6502.*
 import java.io.File
 import me.emu6502.kotlinutils.vt100.*
 import me.emu6502.lib6502.enhancedassembler.EnhancedAssembler
+import java.lang.NumberFormatException
 import java.lang.StringBuilder
 import kotlin.system.exitProcess
 
@@ -224,6 +225,43 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
                         reportError(message)
                 }
             }
+            "pia" -> {
+                var success = false
+                if (cmdArgs.size < 2 || cmdArgs.size > 3) {
+                    reportError("Fehlerhafte Eingabe. Usage: pia <get/set/irq> [a/b] [hexvalue]")
+                    return
+                }
+
+                if (cmdArgs[0] == "get") {
+                    if (cmdArgs[1] == "a") {
+                        writeLine("Port A value: \$${pia.porta.toString("X2")}");
+                        success = true
+                    } else if (cmdArgs[1] == "b") {
+                        writeLine("Port B value: \$${pia.portb.toString("X2")}");
+                        success = true
+                    }
+                    else
+                        success = false
+                } else if (cmdArgs[0] == "set") {
+                    if (cmdArgs[1] == "a") {
+                        try {
+                            pia.porta = cmdArgs[2].toInt(16).ubyte
+                            success = true
+                        }catch (e: NumberFormatException) { }
+                    } else if (cmdArgs[1] == "b") {
+                        try {
+                            pia.portb = cmdArgs[2].toInt(16).ubyte
+                            success = true
+                        }catch (e: NumberFormatException) { }
+                    } else if (cmdArgs[1] == "irq") {
+                        pia.irq = !pia.irq
+                        success = true
+                    } else
+                        success = false
+                }
+                if (success) return
+                writeLine("Fehlerhafte Eingabe!")
+            }
             else -> reportError("Unbekannter Befehl! Tabulatortaste für eine Befehlsübersicht drücken.")
         }
 
@@ -252,6 +290,7 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
         defineCommand("br", "br", "Remove breakpoint")
         defineCommand("r", "r", "Run until breakpoint or end")
         defineCommand("as", "as", "Assemble file to memory address")
+        defineCommand("pia", "pia", "Get or set Port A/B or trigger q")
 
         reset()
     }
