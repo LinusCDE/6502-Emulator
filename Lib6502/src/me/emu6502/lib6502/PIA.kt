@@ -11,64 +11,66 @@ class PIA(private val cpu: CPU, position: UShort): Device(position, position plu
         private set
     var outb = false
         private set
+    var _porta = 0x00.ubyte
+    var porta: UByte
+        get() {
+            if(!outa) return 0x00.ubyte
+            _rdya = false
+            return _porta
+        }
+        set(value) {
+            if(outa) return
+            _porta = value
+            _rdya = true
+        }
 
-    var porta: UByte = 0x00.ubyte
-        get() =
-            if(outa) {
-                rdya = false
-                field
-            }else
-                0x00.ubyte
-        private set
-    fun updatePorta(newPorta: UByte) {
-        if(outa) return
-        porta = newPorta
-        irq = true
-    }
+    var _portb = 0x00.ubyte
+    var portb: UByte
+        get() {
+            if(!outb) return 0x00.ubyte
+            _rdyb = false
+            return _portb
+        }
+        set(value) {
+            if(outb) return
+            _portb = value
+            _rdyb = true
+        }
 
-    var portb: UByte = 0x00.ubyte
-        get() =
-            if(outb) {
-                rdyb = false
-                field
-            }else
-                0x00.ubyte
-        private set
-    fun updatePortb(newPortb: UByte) {
-        if(outb) return
-        portb = newPortb
-        irq = true
-    }
+    var _rdya = false
+    var rdya: Boolean
+        get() = _rdya
+        set(value) {
+            if(outa) return
+            _rdya = value
+            if(irq) cpu.IRQ = true
+        }
+    var _rdyb = false
+    var rdyb: Boolean
+        get() = _rdyb
+        set(value) {
+            if(outb) return
+            _rdyb = value
+            if(irq) cpu.IRQ = true
+        }
 
-    var rdya = false
-        private set
-    fun updateRdya(newRdya: Boolean) {
-        if(outa) return
-        rdya = newRdya
-        if(irq) cpu.IRQ = true
-    }
+    fun inspectPorta() = _porta
+    fun inspectPortb() = _portb
 
-    var rdyb = false
-        private set
-    fun updateRdyb(newRdyb: Boolean) {
-        if(outb) return
-        rdyb = newRdyb
-        if(irq) cpu.IRQ = true
-    }
 
     override fun setData(data: UByte, address: UShort) {
         if(!request(address)) return
         when((address - start).int) {
             0 -> { // PORTA
                 if(outa) {
-                    porta = data
-                    rdya = true
+                    _porta = data
+                    _rdya = true
                 }
             }
             1 -> { // PORTB
                 if(outb) {
-                    portb = data
-                    rdyb = true
+                    _portb = data
+                    _rdyb = true
                 }
             }
             2 -> { //DDR (- - - - - - OUTB OUTA)
@@ -77,9 +79,9 @@ class PIA(private val cpu: CPU, position: UShort): Device(position, position plu
             }
             3 -> { //RDYR (- - - - - - RDYB RDYA)
                 if(outa)
-                    rdya = CPU.checkBit(data, 0)
+                    _rdya = CPU.checkBit(data, 0)
                 if(outb)
-                    rdyb = CPU.checkBit(data, 1)
+                    _rdyb = CPU.checkBit(data, 1)
             }
         }
     }
@@ -88,17 +90,17 @@ class PIA(private val cpu: CPU, position: UShort): Device(position, position plu
         if(request(address)) return 0x00.ubyte
         return when((address - start).int) {
             0 -> { // PORTA
-                if(!outa) rdya = false
-                porta
+                if(!outa) _rdya = false
+                _porta
             }
             1 -> { // PORTB
-                if(!outb) rdyb = false
-                portb
+                if(!outb) _rdyb = false
+                _portb
             }
             2 -> //DDR (- - - - - - OUTB OUTA)
                 (((if(outb) 1 else 0) shl 1) + (if(outa) 1 else 0)).ubyte
             3 -> //RDYR (- - - - - - RDYB RDYA)
-                (((if(rdyb) 1 else 0) shl 1) + (if(rdya) 1 else 0)).ubyte
+                (((if(_rdyb) 1 else 0) shl 1) + (if(_rdya) 1 else 0)).ubyte
             else -> 0x00.ubyte // Should never be reached! TODO: Error out
         }
     }

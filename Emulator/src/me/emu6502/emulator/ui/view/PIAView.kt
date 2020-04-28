@@ -21,8 +21,8 @@ class PIAView: View() {
                 else
                     (pia.porta.int and mask.inv()).ubyte
 
-                controller.emulator.pia.updatePorta(newPorta)
-                if(pia.porta != newPorta)
+                controller.emulator.pia.porta = newPorta
+                if(pia.inspectPorta() != newPorta)
                     controller.uiHandleAsync { controller.emulator.updatePia(pia) }
             }
         }
@@ -39,8 +39,8 @@ class PIAView: View() {
                 else
                     (pia.portb.int and mask.inv()).ubyte
 
-                pia.updatePortb(newPortb)
-                if(pia.portb != newPortb)
+                pia.portb = newPortb
+                if(pia.inspectPortb() != newPortb)
                     controller.uiHandleAsync { controller.emulator.updatePia(pia) }
             }
         }
