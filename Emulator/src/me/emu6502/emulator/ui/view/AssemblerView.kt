@@ -120,7 +120,7 @@ class AssemblerView: View() {
 
             val whiteSpace = Pattern.compile("^\\s+")
             addEventHandler(KeyEvent.KEY_PRESSED) {
-                if (it.code === KeyCode.ENTER) {
+                if (it.code === KeyCode.ENTER && !it.isControlDown) {
                     val caretPosition: Int = caretPosition
                     val currentParagraph: Int = currentParagraph
                     val m0: Matcher = whiteSpace.matcher(getParagraph(currentParagraph - 1).segments[0])
