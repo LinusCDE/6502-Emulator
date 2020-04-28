@@ -1,6 +1,7 @@
 package me.emu6502.emulator.ui.view
 
 import javafx.scene.Parent
+import javafx.scene.control.Tooltip
 import javafx.util.Duration
 import me.emu6502.emulator.darkModeEnabled
 import me.emu6502.emulator.ui.CommandInfo
@@ -29,6 +30,7 @@ class MainView: View(title = "6502-Emulator") {
                 }
             }
             titledpane("PIA (\$${controller.emulator.pia.start.toString("X4")})") {
+                tooltip = Tooltip("Parallel I/O Adapter")
                 isExpanded = false
                 add(PIAView())
             }
