@@ -10,6 +10,7 @@ import javafx.scene.control.ButtonType
 import javafx.scene.image.Image
 import me.emu6502.emulator.Emulator
 import me.emu6502.emulator.ui.CommandInfo
+import me.emu6502.kotlinutils.int
 import tornadofx.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -20,6 +21,11 @@ class MainController: Controller() {
     var screenImage by screenImageProperty
 
     val console: ConsoleController by inject()
+
+    val porta = Array(8) { SimpleBooleanProperty(false) }
+    val outa = SimpleBooleanProperty(false)
+    val portb = Array(8) { SimpleBooleanProperty(false) }
+    val outb = SimpleBooleanProperty(false)
 
     val emulator = Emulator(
             clear = {  console.clear() },
@@ -32,6 +38,16 @@ class MainController: Controller() {
             updateScreen = {
                 uiHandleAsync {
                     screenImage = SwingFXUtils.toFXImage(it.bitmapScreen.image, null)
+                }
+            },
+            updatePia = { pia ->
+                uiHandleAsync {
+                    for(bit in 0 until 8) {
+                        porta[7 - bit].set(pia.porta.int and (1 shl bit) > 0)
+                        portb[7 - bit].set(pia.portb.int and (1 shl bit) > 0)
+                    }
+                    outa.set(pia.outa)
+                    outb.set(pia.outb)
                 }
             }
     )

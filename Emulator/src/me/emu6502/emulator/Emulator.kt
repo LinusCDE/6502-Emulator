@@ -8,7 +8,7 @@ import me.emu6502.lib6502.enhancedassembler.EnhancedAssembler
 import java.lang.StringBuilder
 import kotlin.system.exitProcess
 
-class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> Unit,
+class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> Unit, val updatePia: (PIA) -> Unit,
                val clear: () -> Unit, val write: (String) -> Unit, val writeLine: (String) -> Unit,
                val defineCommand: (name: String, displayName: String, desc: String) -> Unit) {
 
@@ -80,6 +80,7 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
         mainbus.devices.add(pia)
 
         updateScreen(screen)
+        updatePia(pia)
     }
 
     private fun setUShortOrComplain(cmdArgs: List<String>, usage: String = "", callback: ((value: UShort) -> Unit)) {
@@ -189,6 +190,7 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
                 cpu.step()
                 mainbus.performClockActions()
                 updateScreen(screen)
+                updatePia(pia)
                 //textscreen.screenshot()
             }
             "bl" -> writeLine(breakpoints.map { it.toString("X4") }.joinToString(", "))
@@ -200,6 +202,7 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
                     mainbus.performClockActions()
                 } while (!breakpoints.contains(cpu.PC) && mainbus.getData(cpu.PC) != 0x00.ubyte)
                 updateScreen(screen)
+                updatePia(pia)
                 //textscreen.screenshot()
             }
             "as" -> {

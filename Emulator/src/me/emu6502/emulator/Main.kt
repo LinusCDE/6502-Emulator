@@ -14,6 +14,7 @@ fun main(args: Array<String>) {
                 defineCommand = { name, displayName, desc -> Console.completer.addCommand(name, displayName, desc) },
                 reportError = { Console.writeLine(it); Console.readKey() },
                 updateScreen = { it.screenshot() },
+                updatePia = { /* Not supported in console, yet */ },
                 write = { Console.write(it) },
                 writeLine = { Console.writeLine(it) }
         )
