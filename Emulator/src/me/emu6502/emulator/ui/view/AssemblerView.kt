@@ -107,7 +107,7 @@ class AssemblerView: View() {
             }
 
             style {
-                prefColumnCount = 30
+                prefWidth = Dimension(25.0, Dimension.LinearUnits.em)
                 isWrapText = false
                 fontFamily = "monospaced"
             }

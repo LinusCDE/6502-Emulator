@@ -9,10 +9,12 @@ import tornadofx.*
 class MainView: View(title = "6502-Emulator") {
     val controller: MainController by inject()
 
-    override val root: Parent = hbox {
-        add(AssemblerView())
-        add(ConsoleView())
-        vbox {
+    override val root: Parent = borderpane {
+        center = splitpane {
+            add(AssemblerView())
+            add(ConsoleView())
+        }
+        right = vbox {
             label("Screen:")
             imageview {
                 val scale = 2.0
