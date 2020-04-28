@@ -13,7 +13,7 @@ enum class AddressMode(val addressBytes: Int, val prefix: String, val suffix: St
     IMMEDIATE(1,"#$", "", 2),
     INDIRECT(2,"($", ")", 4),
     INDEX_X(1,"($", ",X)", 2),
-    INDEX_Y(1,"($", ",Y)", 4),
+    INDEX_Y(1,"($", ",Y)", 2),
     ZEROPAGE(1,"$", "", 2),
     ZEROPAGE_X(1,"$", ",X", 2),
     ZEROPAGE_Y(1,"$", ",Y", 2);

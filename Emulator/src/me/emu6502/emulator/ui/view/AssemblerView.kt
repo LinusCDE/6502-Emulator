@@ -82,7 +82,9 @@ class AssemblerView: View() {
                     // Set style that will be applied immediately after typing
                     // This might apply the wrong style briefly but not all text flat out default
                     // when writing already styled sections
-                    setStyleClass(caretPosition - 1, caretPosition, lastStyleAtCaret)
+                    try {
+                        setStyleClass(caretPosition - 1, caretPosition, lastStyleAtCaret)
+                    }catch (e: IndexOutOfBoundsException) { }
                 }
             }
 
@@ -103,6 +105,14 @@ class AssemblerView: View() {
             multiPlainChanges().successionEnds(Duration.ofMillis(250))
                     .subscribe { updateSyntax() } // Update x millis after stopping to write
 
+            controller.sourceCodeProperty.onChange {
+                if(it != text) {
+                    replaceText(it)
+                    controller.mainController.uiHandleAsync { updateSyntax() }
+                }
+            }
+            textProperty().onChange { controller.sourceCode = it }
+            replaceText(controller.sourceCode)
             controller.mainController.uiHandleAsync { updateSyntax() } // Highlight on init
         })
         bottom = label(controller.statusMessageProperty) {
