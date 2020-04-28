@@ -6,17 +6,17 @@ import me.emu6502.lib6502.enhancedassembler.EnhancedAssembler
 enum class Routine(val memoryAddress: UShort, unformattedSourceCode: String) {
 
     CHAR_DSP(0x001C.ushort, """
-                LDA €D007
+                LDA €D013
                 CMP #€01
                 BNE €F9
                 LDA €00
-                STA €D004
+                STA €D010
                 LDA €01
-                STA €D005
+                STA €D011
                 LDA €02
-                STA €D006
+                STA €D012
                 LDA #€02
-                STA €D007
+                STA €D013
                 RTS"""),
 
     PIXEL_DSP(0x0000.ushort, """

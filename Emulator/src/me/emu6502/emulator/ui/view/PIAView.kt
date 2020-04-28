@@ -3,6 +3,7 @@ package me.emu6502.emulator.ui.view
 import javafx.scene.Parent
 import me.emu6502.emulator.ui.controller.MainController
 import me.emu6502.kotlinutils.int
+import me.emu6502.kotlinutils.toString
 import me.emu6502.kotlinutils.ubyte
 import tornadofx.*
 
@@ -21,6 +22,8 @@ class PIAView: View() {
                     (pia.porta.int and mask.inv()).ubyte
 
                 controller.emulator.pia.updatePorta(newPorta)
+                if(pia.porta != newPorta)
+                    controller.uiHandleAsync { controller.emulator.updatePia(pia) }
             }
         }
     }
@@ -36,7 +39,9 @@ class PIAView: View() {
                 else
                     (pia.portb.int and mask.inv()).ubyte
 
-                controller.emulator.pia.updatePortb(newPortb)
+                pia.updatePortb(newPortb)
+                if(pia.portb != newPortb)
+                    controller.uiHandleAsync { controller.emulator.updatePia(pia) }
             }
         }
     }

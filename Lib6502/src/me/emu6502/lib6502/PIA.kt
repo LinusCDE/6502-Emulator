@@ -21,7 +21,7 @@ class PIA(private val cpu: CPU, position: UShort): Device(position, position plu
                 0x00.ubyte
         private set
     fun updatePorta(newPorta: UByte) {
-        if(!outa) return
+        if(outa) return
         porta = newPorta
         irq = true
     }
@@ -35,7 +35,7 @@ class PIA(private val cpu: CPU, position: UShort): Device(position, position plu
                 0x00.ubyte
         private set
     fun updatePortb(newPortb: UByte) {
-        if(!outb) return
+        if(outb) return
         portb = newPortb
         irq = true
     }
@@ -61,14 +61,14 @@ class PIA(private val cpu: CPU, position: UShort): Device(position, position plu
         when((address - start).int) {
             0 -> { // PORTA
                 if(outa) {
-                    updatePorta(data)
-                    updateRdya(true)
+                    porta = data
+                    rdya = true
                 }
             }
             1 -> { // PORTB
                 if(outb) {
-                    updatePortb(data)
-                    updateRdyb(true)
+                    portb = data
+                    rdyb = true
                 }
             }
             2 -> { //DDR (- - - - - - OUTB OUTA)
@@ -77,9 +77,9 @@ class PIA(private val cpu: CPU, position: UShort): Device(position, position plu
             }
             3 -> { //RDYR (- - - - - - RDYB RDYA)
                 if(outa)
-                    updateRdya(CPU.checkBit(data, 0))
+                    rdya = CPU.checkBit(data, 0)
                 if(outb)
-                    updateRdyb(CPU.checkBit(data, 1))
+                    rdyb = CPU.checkBit(data, 1)
             }
         }
     }

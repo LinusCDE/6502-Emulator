@@ -11,6 +11,7 @@ import javafx.scene.image.Image
 import me.emu6502.emulator.Emulator
 import me.emu6502.emulator.ui.CommandInfo
 import me.emu6502.kotlinutils.int
+import me.emu6502.kotlinutils.toString
 import tornadofx.*
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock

@@ -20,7 +20,7 @@ class CPU(val bus: Bus) {
 
     //region Helpers
     companion object {
-        fun checkBit(value: UByte, bit: Int): Boolean = ((value shiftLeft (7 - bit)) shiftRight 7) == 1.uint
+        fun checkBit(value: UByte, bit: Int): Boolean = ((1 shl bit) and value.int) > 0
 
         fun BCDToDec(bcd: UByte): UByte = (10 * (bcd.int shr 4) + (bcd.int and 0xF)).ubyte
 
