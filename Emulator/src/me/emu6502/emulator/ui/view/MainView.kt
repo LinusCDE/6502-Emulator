@@ -20,7 +20,7 @@ class MainView: View(title = "6502-Emulator") {
         }
         right = vbox {
             titledpane("Screen (\$${controller.emulator.screen.start.toString("X4")})") {
-                isExpanded = false
+                isExpanded = true
                 imageview {
                     val scale = 2.0
                     fitWidth = 140 * scale
@@ -31,11 +31,11 @@ class MainView: View(title = "6502-Emulator") {
             }
             titledpane("PIA (\$${controller.emulator.pia.start.toString("X4")})") {
                 tooltip = Tooltip("Parallel I/O Adapter")
-                isExpanded = false
+                isExpanded = true
                 add(PIAView())
             }
             titledpane("Befehlsübersicht") {
-                isExpanded = true
+                isExpanded = false
                 tableview(controller.commands) {
                     column("Name", CommandInfo::nameProperty)
                     column("Beschreibung", CommandInfo::descriptionProperty)
