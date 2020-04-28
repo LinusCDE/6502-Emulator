@@ -61,7 +61,7 @@ class EnhancedAssembler {
                     ?.runCatching {
                         pc = this.line.split(' ')[1].trim('$').toInt(16).ushort
                     }
-            println("Origin set to $${pc.toString("X4")}")
+            //println("Origin set to $${pc.toString("X4")}")
 
             for (codeline in lines) {
                 if (codeline isType CodeLine.Companion.LineType.LABEL) {
@@ -134,7 +134,7 @@ class EnhancedAssembler {
                 for(bc in byteCodes.filter { it.label == data.label }) {
                     bc.code[1] = BitConverter.GetBytes(pc)[0];
                     bc.code[2] = BitConverter.GetBytes(pc)[1];
-                    println("Data ${data.label} is used at ${pc.toString("X4")}")
+                    //println("Data ${data.label} is used at ${pc.toString("X4")}")
                 }
 
                 data.position = pc
