@@ -73,10 +73,10 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
         /*textscreen = TextScreen(40, 25, 0xD004.ushort).apply { reset() }
         mainbus.devices.add(textscreen)*/
 
+        cpu = CPU(mainbus).apply { PC = 0x0200.ushort }
+
         pia = PIA(cpu, 0xD010.ushort)
         mainbus.devices.add(pia)
-
-        cpu = CPU(mainbus).apply { PC = 0x0200.ushort }
 
         updateScreen(screen)
     }
