@@ -6,6 +6,7 @@ import javafx.scene.Parent
 import javafx.scene.control.Tooltip
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
+import javafx.scene.input.MouseEvent
 import javafx.stage.FileChooser
 import me.emu6502.emulator.ui.controller.AssemblerController
 import me.emu6502.lib6502.AddressMode
@@ -97,7 +98,12 @@ class AssemblerView: View() {
                     }
                 }
                 right = button("Assemble") {
-                    action { controller.onAssembleButtonPressed() }
+                    addEventHandler(MouseEvent.MOUSE_CLICKED) {
+                        if(it.isControlDown)
+                            controller.onAssembleMovePcAndRunButtonPressed()
+                        else
+                            controller.onAssembleButtonPressed()
+                    }
                 }
             }
         }
@@ -138,6 +144,11 @@ class AssemblerView: View() {
                         setStyleClass(caretPosition - 1, caretPosition, lastStyleAtCaret)
                     }catch (e: IndexOutOfBoundsException) { }
                 }
+            }
+
+            addEventHandler(KeyEvent.KEY_PRESSED) {
+                if(it.isControlDown && it.code == KeyCode.ENTER)
+                    controller.onAssembleMovePcAndRunButtonPressed()
             }
 
             val updateSyntax = {

@@ -13,7 +13,6 @@ import tornadofx.setValue
 import java.io.File
 import java.io.IOException
 import java.lang.Exception
-import java.lang.StringBuilder
 
 class AssemblerController: Controller() {
     val mainController: MainController by inject()
@@ -33,6 +32,18 @@ class AssemblerController: Controller() {
         runAsync {
             val (_, status) = mainController.emulator.assembleToMemory(sourceCode, memAddr)
             ui { statusMessage = status }
+        }
+    }
+
+    fun onAssembleMovePcAndRunButtonPressed() {
+        val memAddr = memoryAddress.toInt(16)
+        runAsync {
+            val (_, status) = mainController.emulator.assembleToMemory(sourceCode, memAddr)
+            ui {
+                statusMessage = "Assemble, move PC and run..."
+                mainController.emulator.cpu.PC = memAddr.ushort
+                mainController.emulator.executeDebuggerCommand("r")
+            }
         }
     }
 
