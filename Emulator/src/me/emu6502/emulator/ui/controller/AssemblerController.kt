@@ -5,8 +5,8 @@ import javafx.beans.property.SimpleStringProperty
 import me.emu6502.emulator.Emulator
 import me.emu6502.kotlinutils.ushort
 import me.emu6502.lib6502.AssembleException
+import me.emu6502.lib6502.Assembler
 import me.emu6502.lib6502.Disassembler
-import me.emu6502.lib6502.enhancedassembler.EnhancedAssembler
 import tornadofx.Controller
 import tornadofx.getValue
 import tornadofx.onChange
@@ -68,7 +68,8 @@ class AssemblerController: Controller() {
 
     fun onSaveAssemblyToDisk(file: File) {
         try {
-            file.writeBytes(EnhancedAssembler.assemble(sourceCode).toByteArray())
+            val memAddr = memoryAddress.toInt(16)
+            file.writeBytes(Assembler.assemble(sourceCode, memAddr).toByteArray())
             statusMessage = "Assemblierte Datei gespeichert"
         }catch (e: AssembleException) {
             statusMessage = "Assemble-Fehler: ${e.message}"

@@ -72,6 +72,9 @@ enum class Instruction(vararg val opCodeAddrModes: Pair<Int, AddressMode>, val f
     fun findAddressMode(opCode: Int): AddressMode? =
             opCodeAddrModes.firstOrNull { (instrOpCode, _) -> instrOpCode == opCode }?.second
 
+    fun isAddressModeSupported(addrMode: AddressMode) =
+            opCodeAddrModes.firstOrNull { (_, cAddrMode) -> addrMode == cAddrMode } != null
+
     companion object {
         fun find(opCode: Int): Instruction? = values().firstOrNull() {
             opCode == it.fixedOpCode || it.findAddressMode(opCode) != null

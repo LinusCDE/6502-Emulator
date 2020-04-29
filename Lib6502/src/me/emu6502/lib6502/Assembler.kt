@@ -2,11 +2,11 @@ package me.emu6502.lib6502
 
 import me.emu6502.kotlinutils.*
 import java.io.ByteArrayOutputStream
-import java.util.regex.Pattern
+import java.lang.Exception
 
 class Assembler {
 
-    class AssemblerLine(val instruction: Instruction, var operator: String, var assignedMemoryLabel: String?) {
+    open class AssemblerLine(val instruction: Instruction, var operator: String, var assignedMemoryLabel: String?) {
         fun findAddressMode(): AddressMode? {
             for((opcode, addrMode) in instruction.opCodeAddrModes) {
                 if(addrMode.parse(operator) != null)
@@ -29,9 +29,18 @@ class Assembler {
 
         var resolvedAddressData: UByteArray? = null
 
-        fun isOperatorReferencingMemoryLabel() = instruction.opCodeAddrModes.size > 0 && findOpCode() == null
+        open fun isOperatorReferencingMemoryLabel() = instruction.opCodeAddrModes.size > 0 && findOpCode() == null
 
-        fun findAdequateReferenceAddressMode(): AddressMode? {
+        open fun findAdequateReferenceAddressMode(): AddressMode? {
+
+            // Only allow ABSOLUTE for referencing directive storage
+            if(referencedAssemblerLine != null && referencedAssemblerLine is AssemblerDirectiveLine) {
+                if(instruction.isAddressModeSupported(AddressMode.ABSOLUTE))
+                    return AddressMode.ABSOLUTE
+                else
+                    null
+            }
+
             for(mode in arrayOf(AddressMode.ABSOLUTE, AddressMode.ZEROPAGE)) {
                 if (instruction.opCodeAddrModes.any { (_, addrMode) -> addrMode == mode })
                     return mode
@@ -39,7 +48,7 @@ class Assembler {
             return null
         }
 
-        fun compile(): UByteArray? {
+        open fun compile(): UByteArray? {
             val opCode = findOpCode()
             if(opCode == null || resolvedAddressData == null) return null
             return UByteArray(1 + resolvedAddressData!!.size) {i ->
@@ -47,7 +56,7 @@ class Assembler {
             }
         }
 
-        fun expectedSize(): Int? {
+        open fun expectedSize(): Int? {
             if(resolvedAddressData != null)
                 return 1 + resolvedAddressData!!.size
             if(referencedAssemblerLine != null)
@@ -59,11 +68,25 @@ class Assembler {
         override fun toString(): String = instruction.name + " " + operator
     }
 
+    class AssemblerDirectiveLine(val name: String, val content: UByteArray): AssemblerLine(Instruction.NOP/*DUMMY!*/, "", name) {
+        init {
+            resolvedAddressData = UByteArray(0)
+        }
+
+        override fun isOperatorReferencingMemoryLabel(): Boolean = false
+        override fun compile(): UByteArray? = content
+        override fun expectedSize(): Int? = content.size
+
+        override fun toString(): String = "Directive with ${content.size} bytes of data"
+    }
+
     companion object {
         private val ZEROPAGE_LABEL_JUMP_INSTRUCTIONS = arrayOf(Instruction.BCC, Instruction.BCS, Instruction.BEQ, Instruction.BMI, Instruction.BNE, Instruction.BPL, Instruction.BVC, Instruction.BVS)
         private val ABSOLUTE_LABEL_JUMP_INSTRUCTIONS = arrayOf(Instruction.JMP, Instruction.JSR)
 
-        fun assemble(code: String, targetMemoryAddress: Int?): UByteArray {
+        fun assemble(code: String, defaultTargetMemoryAddress: Int?): UByteArray {
+            var defaultTargetMemoryAddress = defaultTargetMemoryAddress // Make changeable (for .ORG)
+
             val usefulStringLines = code.split("\n")
                     .map { if(";" in it) it.split(";")[0] else it }
                     .map { it.trim() }
@@ -83,7 +106,7 @@ class Assembler {
 
             val variables = hashMapOf<String, String>()
 
-            // Remove and gather variables
+            // Parse variables (and remove those lines)
             usefulStringLines.removeIf { line ->
                 if('=' in line) {
                     val sp = line.split('=')
@@ -95,8 +118,62 @@ class Assembler {
             }
 
             val lines = arrayListOf<AssemblerLine>()
+            val directives = arrayListOf<AssemblerDirectiveLine>() // To be added to the end of lines later
 
-            // Basic parsing of source code (assigning of instructions and memory labels to them)
+            // Parse directives (and remove those lines)
+            usefulStringLines.removeIf { line ->
+                if(line.startsWith('.')) {
+                    // Is directive
+                    if(' ' !in line)
+                        throw AssembleException("Ungültige Directive: \"$line\"")
+                    val sp = line.split(' ')
+                    if(sp.size == 3) {
+                        val name = sp[1]
+                        val data = sp[2]
+                        if (line.startsWith(".BYTE", true)) {
+                            val values = if (',' in data) data.split(',') else listOf(data)
+                            try {
+                                val bytes = values
+                                        .map { it.trim('$') }
+                                        .map { it.toUByte(16) }
+                                        .toUByteArray()
+                                directives.add(AssemblerDirectiveLine(name, bytes))
+                                return@removeIf true
+                            } catch (e: Exception) {
+                                throw AssembleException("Fehler beim parsen der byte(s) in: \"$line\"")
+                            }
+                        } else if (line.startsWith(".STRING", true)) {
+                            try {
+                                val bytes = (data.trim('"').toByteArray(Charsets.US_ASCII) + listOf(0x00.toByte())).toUByteArray()
+                                directives.add(AssemblerDirectiveLine(name, bytes))
+                                return@removeIf true
+                            } catch (e: Exception) {
+                                throw AssembleException("Fehler beim parsen der byte(s) in: \"$line\"")
+                            }
+                        }else {
+                            throw AssembleException("Unbekannte Directive oder parameterzahl falsch: \"$line\"")
+                        }
+                    }else if(sp.size == 2) {
+                        val data = sp[1]
+                        if(line.startsWith(".ORG", true)) {
+                            try {
+                                defaultTargetMemoryAddress = data.trim('$').toUShort(16).int
+                                return@removeIf true
+                            }catch (e: Exception) {
+                                throw AssembleException("Fehlerhafte Ursprungs-Adresse zu .ORG: \"$line\"")
+                            }
+                        }else
+                            throw AssembleException("Unbekannte Directive oder parameterzahl falsch: \"$line\"")
+                    }else
+                        throw AssembleException("Unbekannte Directive oder parameterzahl falsch: \"$line\"")
+                }
+                false
+            }
+
+            val targetMemoryAddress = defaultTargetMemoryAddress // Make overrideable (by .ORG directive)
+
+
+            // Basic parsing of remaining source lines (assigning of instructions and memory labels to them)
             // and finding variables
             var prevMemoryLabel: String? = null
             for(line in usefulStringLines) {
@@ -120,6 +197,9 @@ class Assembler {
                 if(prevMemoryLabel != null)
                     prevMemoryLabel = null
             }
+
+            // Add directives after lines (directives is not used anymore!)
+            lines.addAll(directives)
 
             // Find referenced memory labels
             for(line in lines) {
@@ -166,7 +246,7 @@ class Assembler {
                             line.resolvedAddressData = line.findAddressMode()!!.parse(line.operator)
                         }
                         AddressMode.ABSOLUTE -> {
-                            if(line.instruction !in ABSOLUTE_LABEL_JUMP_INSTRUCTIONS)
+                            if(line.instruction !in ABSOLUTE_LABEL_JUMP_INSTRUCTIONS && line.referencedAssemblerLine !is AssemblerDirectiveLine)
                                 throw AssembleException("Keine absoluten Sprünge für diese Instruction erlaubt: \"$line\"")
                             if(targetMemoryAddress == null)
                                 throw AssembleException("Sprung zu Absoluter Adresse nicht berechenbar, da Speicherort fehlt!")
