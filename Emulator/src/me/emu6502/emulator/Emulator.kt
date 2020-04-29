@@ -199,7 +199,7 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
             "r" -> {
                 Thread() {
                     val frequency = 1000000 // Cycled per second
-                    val cyclesPerSync = frequency / 5
+                    val cyclesPerSync = frequency / 10
                     val startedAt = System.currentTimeMillis()
                     var syncCount = 0
                     var cycleSum = 0
@@ -210,7 +210,7 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
                         //if(cycleSum >= syncCount * cyclesPerSync) {
                         if(cycleSum >= awaitedCycles) {
                             awaitedCycles += cyclesPerSync
-                            val sleepTime = 200 - (System.currentTimeMillis() - (startedAt + (syncCount*200)))
+                            val sleepTime = 100 - (System.currentTimeMillis() - (startedAt + (syncCount*100)))
                             syncCount++
                             updateScreen(screen)
                             updatePia(pia)
