@@ -1211,9 +1211,15 @@ class CPU(val bus: Bus) {
         else { cycles-- }
     }
 
-    fun step() {
+    fun step(): Int {
         exec()
-        while (cycles > 0) exec()
+        var sum = cycles
+        while (cycles > 0) {
+            exec()
+            sum += cycles
+        }
+
+        return sum
     }
     //endregion
 }

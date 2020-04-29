@@ -197,13 +197,36 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
             "ba" -> setUShortOrComplain(cmdArgs) { breakpoints.add(it) }
             "br" -> setUShortOrComplain(cmdArgs) { breakpoints.remove(it) }
             "r" -> {
-                do {
-                    cpu.step()
-                    mainbus.performClockActions()
-                } while (!breakpoints.contains(cpu.PC) && mainbus.getData(cpu.PC) != 0x00.ubyte)
-                updateScreen(screen)
-                updatePia(pia)
-                //textscreen.screenshot()
+                Thread() {
+                    val frequency = 1000000 // Cycled per second
+                    val cyclesPerSync = frequency / 5
+                    val startedAt = System.currentTimeMillis()
+                    var syncCount = 0
+                    var cycleSum = 0
+                    var awaitedCycles = cyclesPerSync
+                    do {
+                        cycleSum += cpu.step()
+                        mainbus.performClockActions()
+                        //if(cycleSum >= syncCount * cyclesPerSync) {
+                        if(cycleSum >= awaitedCycles) {
+                            awaitedCycles += cyclesPerSync
+                            val sleepTime = 200 - (System.currentTimeMillis() - (startedAt + (syncCount*200)))
+                            syncCount++
+                            updateScreen(screen)
+                            updatePia(pia)
+                            printStatus()
+
+                            if(sleepTime > 3)
+                                Thread.sleep(sleepTime)
+                        }
+                    } while (!breakpoints.contains(cpu.PC) && mainbus.getData(cpu.PC) != 0x00.ubyte)
+                    updateScreen(screen)
+                    updatePia(pia)
+                    //textscreen.screenshot()
+                    printStatus()
+                    writeLine("Program exited after $cycleSum cycles (${System.currentTimeMillis() - startedAt} ms).")
+                }.start()
+                return
             }
             "as" -> {
                 if(cmdArgs.size < 2) {
