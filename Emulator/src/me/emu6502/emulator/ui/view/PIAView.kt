@@ -27,7 +27,7 @@ class PIAView: View() {
             hbox {
                 for(cb in PORTA)
                     add(cb)
-                button("Set Port A") {
+                button("Set") {
                     disableProperty().bind(controller.outa)
                     action {
                         var newPortA = 0.ubyte
@@ -45,7 +45,7 @@ class PIAView: View() {
             hbox {
                 for(cb in PORTB)
                     add(cb)
-                button("Set Port B") {
+                button("Set") {
                     disableProperty().bind(controller.outb)
                     action {
                         var newPortB = 0.ubyte

@@ -113,73 +113,85 @@ class BasicVT100View(val cols: Int, val rows: Int): Canvas() {
     }
 
     fun draw() {
-        //val start = System.currentTimeMillis()
-        hasBlinkingCells = false
+        synchronized(engine) { // Prevent clashes that cells change while drawing
+            //val start = System.currentTimeMillis()
+            hasBlinkingCells = false
 
-        val ctx = graphicsContext2D
-        ctx.font = font
+            val ctx = graphicsContext2D
+            ctx.font = font
 
-        ctx.fill = if(engine.defaultBackground == null) Color.TRANSPARENT else colorMap[engine.defaultBackground!!]!!.defaultPaint
-        if(ctx.fill == Color.TRANSPARENT)
-            ctx.clearRect(0.0, 0.0, width, height)
-        else
-            ctx.fillRect(0.0, 0.0, width, height)
+            ctx.fill = if(engine.defaultBackground == null) Color.TRANSPARENT else colorMap[engine.defaultBackground!!]!!.defaultPaint
+            if(ctx.fill == Color.TRANSPARENT)
+                ctx.clearRect(0.0, 0.0, width, height)
+            else
+                ctx.fillRect(0.0, 0.0, width, height)
 
-        var y = 0.0
-        for (absRow in engine.consoleTop until engine.cells.size) {
-            var x = 0.0
-            val row = absRow - engine.consoleTop
-            for (col in 0 until engine.columns) {
-                val cell = engine.cells[absRow][col]
-                if(cell.cellStyle.blink)
-                    hasBlinkingCells = true
+            var y = 0.0
+            for (absRow in engine.consoleTop until engine.cells.size) {
+                var x = 0.0
+                val row = absRow - engine.consoleTop
+                for (col in 0 until engine.columns) {
+                    val cell = engine.cells[absRow][col]
+                    if(cell.cellStyle.blink)
+                        hasBlinkingCells = true
 
-                val cellBg = if(cell.cellStyle.reverse) cell.cellStyle.foregroundColor else cell.cellStyle.backgroundColor
-                val cellFg = if(cell.cellStyle.reverse) cell.cellStyle.backgroundColor else cell.cellStyle.foregroundColor
-                val selectedBg = cellBg ?: engine.defaultBackground
-                val paintBg = if(selectedBg == null) Color.TRANSPARENT else colorMap[selectedBg]!!.defaultPaint
+                    val cellBg = if(cell.cellStyle.reverse) cell.cellStyle.foregroundColor else cell.cellStyle.backgroundColor
+                    val cellFg = if(cell.cellStyle.reverse) cell.cellStyle.backgroundColor else cell.cellStyle.foregroundColor
+                    val selectedBg = cellBg ?: engine.defaultBackground
+                    val paintBg = if(selectedBg == null) Color.TRANSPARENT else colorMap[selectedBg]!!.defaultPaint
 
-                val termFg = colorMap[cellFg ?: VT100ForegroundColor.BLACK]!!
-                val paintFg = when {
-                    cell.cellStyle.dim -> termFg.dimPaint
-                    cell.cellStyle.bright -> termFg.brightPaint
-                    else -> termFg.defaultPaint
-                }
-
-                if(paintBg != Color.TRANSPARENT) {
-                    ctx.fill = paintBg
-                    ctx.fillRect(x, y + 3, charWidth + 1, charHeight + 1)
-                }
-
-                if(!cell.cellStyle.blink || lastBlinkRefresh == 0L || (System.currentTimeMillis() - lastBlinkRefresh) % (BLINK_DURATION*2) < BLINK_DURATION) {
-                    if(!cell.cellStyle.hidden) {
-                        ctx.fill = paintFg
-                        if(cell.char != null && !cell.char!!.isWhitespace())
-                            ctx.fillText(cell.char.toString(), x, y + charHeight)
-                        if(cell.cellStyle.underscore)
-                            ctx.fillRect(x, y + charHeight + 2, charWidth, 1.0)
+                    val termFg = colorMap[cellFg ?: VT100ForegroundColor.BLACK]!!
+                    val paintFg = when {
+                        cell.cellStyle.dim -> termFg.dimPaint
+                        cell.cellStyle.bright -> termFg.brightPaint
+                        else -> termFg.defaultPaint
                     }
+
+                    if(paintBg != Color.TRANSPARENT) {
+                        ctx.fill = paintBg
+                        ctx.fillRect(x, y + 3, charWidth + 1, charHeight + 1)
+                    }
+
+                    if(!cell.cellStyle.blink || lastBlinkRefresh == 0L || (System.currentTimeMillis() - lastBlinkRefresh) % (BLINK_DURATION*2) < BLINK_DURATION) {
+                        if(!cell.cellStyle.hidden) {
+                            ctx.fill = paintFg
+                            if(cell.char != null && !cell.char!!.isWhitespace())
+                                ctx.fillText(cell.char.toString(), x, y + charHeight)
+                            if(cell.cellStyle.underscore)
+                                ctx.fillRect(x, y + charHeight + 2, charWidth, 1.0)
+                        }
+                    }
+
+                    x += charWidth
                 }
-
-                x += charWidth
+                y += charHeight
             }
-            y += charHeight
-        }
 
-        //println("Update-Time: ${System.currentTimeMillis() - start} ms")
+            //println("Update-Time: ${System.currentTimeMillis() - start} ms")
 
-        if(hasBlinkingCells) {
-            if (lastBlinkRefresh == 0L)
-                lastBlinkRefresh = System.currentTimeMillis()
-        }else {
-            lastBlinkRefresh = 0
+            if(hasBlinkingCells) {
+                if (lastBlinkRefresh == 0L)
+                    lastBlinkRefresh = System.currentTimeMillis()
+            }else {
+                lastBlinkRefresh = 0
+            }
         }
     }
 
     fun write(text: String) {
-        engine.write(text)
-        synchronized(doDraw) {
-            doDraw = true
+        synchronized(engine) { // Prevent draw() crashing because of change caused here
+            try {
+                engine.write(text)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                println("VT Crashed! Clearing it.")
+                engine.reset()
+                engine.write(text)
+            }
+            synchronized(doDraw) {
+                doDraw = true
+            }
+
         }
     }
 
