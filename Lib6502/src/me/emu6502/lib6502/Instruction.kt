@@ -41,7 +41,7 @@ enum class Instruction(vararg val opCodeAddrModes: Pair<Int, AddressMode>, val f
             0xBD to ABSOLUTE_X, 0xB9 to ABSOLUTE_Y, 0xA1 to INDEX_X, 0xB1 to INDEX_Y),
     LDX(0xA2 to IMMEDIATE, 0xA6 to ZEROPAGE, 0xB6 to ZEROPAGE_Y, 0xAE to ABSOLUTE, 0xBE to ABSOLUTE_Y),
     LDY(0xA0 to IMMEDIATE, 0xA4 to ZEROPAGE, 0xB4 to ZEROPAGE_X, 0xAC to ABSOLUTE, 0xBC to ABSOLUTE_X),
-    LSR(0xA4 to ACCUMULATOR, 0x46 to ZEROPAGE, 0x56 to ZEROPAGE_X, 0x4E to ABSOLUTE, 0x5E to ABSOLUTE_X),
+    LSR(0x4A to ACCUMULATOR, 0x46 to ZEROPAGE, 0x56 to ZEROPAGE_X, 0x4E to ABSOLUTE, 0x5E to ABSOLUTE_X),
     NOP(fixedOpCode = 0xEA),
     ORA(0x09 to IMMEDIATE, 0x05 to ZEROPAGE, 0x15 to ZEROPAGE_X, 0x0D to ABSOLUTE,
             0x1D to ABSOLUTE_X, 0x19 to ABSOLUTE_Y, 0x01 to INDEX_X, 0x11 to INDEX_Y),
