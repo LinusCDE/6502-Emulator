@@ -2,8 +2,7 @@ package me.emu6502.lib6502
 
 import me.emu6502.kotlinutils.*
 import java.io.ByteArrayOutputStream
-import java.io.OutputStream
-import java.lang.NumberFormatException
+import java.util.regex.Pattern
 
 class Assembler {
 
@@ -61,18 +60,62 @@ class Assembler {
     }
 
     companion object {
+        private val ZEROPAGE_LABEL_JUMP_INSTRUCTIONS = arrayOf(Instruction.BCC, Instruction.BCS, Instruction.BEQ, Instruction.BMI, Instruction.BNE, Instruction.BPL, Instruction.BVC, Instruction.BVS)
+        private val ABSOLUTE_LABEL_JUMP_INSTRUCTIONS = arrayOf(Instruction.JMP, Instruction.JSR)
+
+        private infix fun String.hasWord(word: String): Boolean {
+            assert(' ' !in word && '\t' !in word)
+            return this.contains(Regex("\\b${Pattern.quote(word)}\\b"))
+        }
+
+        private fun replaceWord(line: String, word: String, replacementWord: String): String {
+            assert(' ' !in word && '\t' !in word)
+            assert(' ' !in replacementWord && '\t' !in replacementWord)
+            val lineWords = (if(' ' in line) line.split(' ') else listOf(line)).toMutableList()
+            for(i in lineWords.indices) {
+                if(lineWords[i] == word)
+                    lineWords[i] = replacementWord
+            }
+            return lineWords.joinToString(" ")
+        }
 
         fun assemble(code: String, targetMemoryAddress: Int?): UByteArray {
-            val lines = arrayListOf<AssemblerLine>()
-
-            // Basic parsing of source code (assigning of instructions and memory labels to them)
-            var prevMemoryLabel: String? = null
-            for(line in code.split("\n")
+            val usefulStringLines = code.split("\n")
                     .map { if(";" in it) it.split(";")[0] else it }
                     .map { it.trim() }
                     .filter{ !it.startsWith(";") }
-                    .filter{ it.isNotBlank() }) {
+                    .filter{ it.isNotBlank() }
+                    .toMutableList()
 
+            // Normalize common whitespace in lines to just a space
+            usefulStringLines.replaceAll { line ->
+                var cleaned = line
+                cleaned = cleaned.replace('\t', ' ')
+                while("  " in cleaned)
+                    cleaned = cleaned.replace("  ", " ")
+
+                return@replaceAll cleaned
+            }
+
+            val variables = hashMapOf<String, String>()
+
+            // Remove and gather variables
+            usefulStringLines.removeIf { line ->
+                if('=' in line) {
+                    val sp = line.split('=')
+                    if (sp.size != 2)
+                        throw AssembleException("Unbekanntes Mnemonic: $line")
+                    variables[sp[0].trim()] = sp[1].trim()
+                    true
+                } else false
+            }
+
+            val lines = arrayListOf<AssemblerLine>()
+
+            // Basic parsing of source code (assigning of instructions and memory labels to them)
+            // and finding variables
+            var prevMemoryLabel: String? = null
+            for(line in usefulStringLines) {
                 if(line.endsWith(":")) {
                     prevMemoryLabel = line.substring(0, line.length - 1).trim()
                     continue
@@ -80,7 +123,10 @@ class Assembler {
 
                 val spacesplit = line.split(' ')
                 val mnemonic = spacesplit[0]
-                val operator = if(spacesplit.size > 1) spacesplit[1] else ""
+                var operator = if(spacesplit.size > 1) spacesplit[1] else ""
+                if(operator in variables)
+                    operator = variables[operator]!!
+
                 val instruction = Instruction.values().firstOrNull {
                     it.name.equals(mnemonic, true)
                 } ?: throw AssembleException("Unbekanntes Mnemonic: $line")
@@ -126,6 +172,8 @@ class Assembler {
 
                     when(addrMode) {
                         AddressMode.ZEROPAGE -> {
+                            if(line.instruction !in ZEROPAGE_LABEL_JUMP_INSTRUCTIONS)
+                                throw AssembleException("Keine relativen/zeropage Sprünge für diese Instruction erlaubt: \"$line\"")
                             val offset = line.referencedAssemblerLine!!.relativeAddress!! - (line.relativeAddress!! + line.expectedSize()!!)
                             if(offset < -128 || offset > 127)
                                 throw AssembleException("Label \"${line.referencedAssemblerLine?.assignedMemoryLabel ?: "???"}\" ist nicht von $line mit einem signed Byte erreichbar (Offset: $offset)!")
@@ -134,6 +182,8 @@ class Assembler {
                             line.resolvedAddressData = line.findAddressMode()!!.parse(line.operator)
                         }
                         AddressMode.ABSOLUTE -> {
+                            if(line.instruction !in ABSOLUTE_LABEL_JUMP_INSTRUCTIONS)
+                                throw AssembleException("Keine absoluten Sprünge für diese Instruction erlaubt: \"$line\"")
                             if(targetMemoryAddress == null)
                                 throw AssembleException("Sprung zu Absoluter Adresse nicht berechenbar, da Speicherort fehlt!")
                             line.operator = "$" + (targetMemoryAddress + line.referencedAssemblerLine!!.relativeAddress!!).toString("X4")
