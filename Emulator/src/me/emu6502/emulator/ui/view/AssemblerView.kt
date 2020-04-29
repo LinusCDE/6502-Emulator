@@ -4,8 +4,10 @@ import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Pos
 import javafx.scene.Parent
+import javafx.scene.control.ToggleGroup
 import javafx.scene.control.Tooltip
 import javafx.scene.input.*
+import javafx.scene.paint.Color
 import javafx.stage.FileChooser
 import me.emu6502.emulator.ui.controller.AssemblerController
 import me.emu6502.lib6502.AddressMode
@@ -107,6 +109,28 @@ class AssemblerView: View() {
                         action {
                             val file: File = binaryFileChooser.showOpenDialog(primaryStage) ?: return@action
                             controller.onLoadBinaryToMemoryPressed(file)
+                        }
+                    }
+                }
+
+                menu("Emulation") {
+                    menu("Emulations-Präzision") {
+                        val toggleGroup = ToggleGroup()
+
+                        val default = controller.mainController.emulationSyncsPerSecond
+                        for(hz in arrayOf(1, 2, 5, 10, 20, 30, 50, 60, 100, 120, 200, 240, 250)) {
+                            radiomenuitem("$hz Hertz", toggleGroup, value = hz) {
+                                if(hz == default)
+                                    isSelected = true
+                                if(hz > 30) {
+                                    style {
+                                        textFill = Color.DARKRED
+                                    }
+                                }
+                                action {
+                                    controller.mainController.emulationSyncsPerSecond = hz
+                                }
+                            }
                         }
                     }
                 }

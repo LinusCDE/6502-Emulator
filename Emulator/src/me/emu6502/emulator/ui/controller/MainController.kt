@@ -2,6 +2,7 @@ package me.emu6502.emulator.ui.controller
 
 import javafx.application.Platform
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.embed.swing.SwingFXUtils
@@ -52,6 +53,12 @@ class MainController: Controller() {
             }
     )
 
+    val emulationSyncsPerSecondProperty = SimpleIntegerProperty(emulator.syncsPerSecond).apply {
+        onChange { emulator.syncsPerSecond = it }
+    }
+    var emulationSyncsPerSecond by emulationSyncsPerSecondProperty
+
+
     fun uiHandleSync(task: () -> Unit) {
         val lock = ReentrantLock()
         val cond = lock.newCondition()
@@ -66,6 +73,7 @@ class MainController: Controller() {
 
     init {
         emulator.printStatus()
+        emulationSyncsPerSecond = 10
     }
 
 }

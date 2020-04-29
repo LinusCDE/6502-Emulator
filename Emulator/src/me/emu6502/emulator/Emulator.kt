@@ -6,6 +6,7 @@ import java.io.File
 import me.emu6502.kotlinutils.vt100.*
 import java.lang.NumberFormatException
 import java.lang.StringBuilder
+import java.text.NumberFormat
 import kotlin.system.exitProcess
 
 class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> Unit, val updatePia: (PIA) -> Unit,
@@ -31,6 +32,9 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
                         .firstOrNull { memoryAddress >= it.memoryStart && memoryAddress <= it.memoryEnd }
     }
 
+    var syncsPerSecond = 5 // Probably best for consoles (changed by ui)
+    var runningThread: Thread? = null
+
     lateinit var cpu: CPU
     lateinit var mainbus: Bus
     lateinit var ram: RAM
@@ -47,6 +51,13 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
     var currentpage: UShort = 0.ushort
 
     fun reset() {
+
+        if(runningThread != null) {
+            try {
+                runningThread!!.stop()
+                printStatus()
+            }catch (e: Exception) { }
+        }
 
         mainbus = Bus()
         ram = RAM(4096.ushort, 0x0000.ushort)
@@ -107,8 +118,15 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
         callback(value)
     }
 
-    fun printStatus(currentPage: UShort = this.currentpage) {
-        clear()
+    fun printStatus(currentPage: UShort = this.currentpage, overwriteOnly: Boolean = false) {
+        if(overwriteOnly) {
+            // Might now overwrite remaining text from a command.
+            // But can be helpful to prevent flicker in rapidly refreshing
+            // scenarios. (Used for in-emulation results)
+            write(VT100Sequence.CURSOR_HOME.toString())
+        }else {
+            clear()
+        }
         writeLine(cpu.toString())
 
         //writeLine("${VT100Sequence.SET_ATTRIBUTE_MODE.toString(VT100Display.RESET_ALL_ATTRIBUTES)}")
@@ -197,26 +215,27 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
             "ba" -> setUShortOrComplain(cmdArgs) { breakpoints.add(it) }
             "br" -> setUShortOrComplain(cmdArgs) { breakpoints.remove(it) }
             "r" -> {
-                Thread() {
+                runningThread = Thread() {
                     val frequency = 1000000 // Cycled per second
-                    val cyclesPerSync = frequency / 10
+                    val cyclesPerSync = frequency / syncsPerSecond
+                    val millisPerSync = 1000 / syncsPerSecond
                     val startedAt = System.currentTimeMillis()
-                    var syncCount = 0
-                    var cycleSum = 0
-                    var awaitedCycles = cyclesPerSync
+                    var syncCount: Long = 0
+                    var cycleSum: Long = 0
+                    var awaitedCycles: Long = cyclesPerSync.toLong()
                     do {
                         cycleSum += cpu.step()
                         mainbus.performClockActions()
                         //if(cycleSum >= syncCount * cyclesPerSync) {
                         if(cycleSum >= awaitedCycles) {
                             awaitedCycles += cyclesPerSync
-                            val sleepTime = 100 - (System.currentTimeMillis() - (startedAt + (syncCount*100)))
+                            val sleepTime = millisPerSync - (System.currentTimeMillis() - (startedAt + (syncCount*millisPerSync)))
                             syncCount++
                             updateScreen(screen)
                             updatePia(pia)
-                            printStatus()
+                            printStatus(overwriteOnly = (syncCount > 0))
 
-                            if(sleepTime > 3)
+                            if(sleepTime >= 8 || (syncsPerSecond >= 60 && sleepTime > 3))
                                 Thread.sleep(sleepTime)
                         }
                     } while (!breakpoints.contains(cpu.PC) && mainbus.getData(cpu.PC) != 0x00.ubyte)
@@ -224,8 +243,10 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
                     updatePia(pia)
                     //textscreen.screenshot()
                     printStatus()
-                    writeLine("Program exited after $cycleSum cycles (${System.currentTimeMillis() - startedAt} ms).")
-                }.start()
+                    val f = NumberFormat.getIntegerInstance()
+                    writeLine("Program exited after ${f.format(cycleSum)} cycles (${f.format(System.currentTimeMillis() - startedAt)} ms).")
+                }
+                runningThread!!.start()
                 return
             }
             "as" -> {
