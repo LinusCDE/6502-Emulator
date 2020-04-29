@@ -1,12 +1,11 @@
 package me.emu6502.emulator.ui.view
 
 import javafx.application.Platform
+import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Pos
 import javafx.scene.Parent
 import javafx.scene.control.Tooltip
-import javafx.scene.input.KeyCode
-import javafx.scene.input.KeyEvent
-import javafx.scene.input.MouseEvent
+import javafx.scene.input.*
 import javafx.stage.FileChooser
 import me.emu6502.emulator.ui.controller.AssemblerController
 import me.emu6502.lib6502.AddressMode
@@ -31,56 +30,82 @@ class AssemblerView: View() {
 
     val asmFileChooser = FileChooser().apply {
         extensionFilters.setAll(FileChooser.ExtensionFilter("Assembly Source Code für 6502 (.s, .asm)", "*.s", "*.asm"))
+        title = "Assembly Source Datei wählen..."
     }
 
     val binaryFileChooser = FileChooser().apply {
-        extensionFilters.setAll(FileChooser.ExtensionFilter("Beliebige Binär-Datei", "*.bin", "*.hex", "*"))
+        extensionFilters.setAll(
+                FileChooser.ExtensionFilter("Programm (.hex, .bin)", "*.hex", "*.bin"),
+                FileChooser.ExtensionFilter("Beliebige Datei (.*)", "*")
+        )
+        title = "Binäre Datei wählen..."
     }
 
-    var lastFile: File? = null
+    init {
+        val programName = "6502-Emulator"
+        titleProperty.bind(controller.openedAssemblyFileProperty.stringBinding { file ->
+            if(file == null)
+                "$programName - Neue Datei"
+            else
+                "$programName - ${file.name}"
+        })
+    }
 
     override val root: Parent = borderpane {
         top = vbox {
             menubar {
                 menu("Assembly") {
-                    item("Laden...") {
+                    item("Neu") {
                         action {
-                            lastFile = asmFileChooser.showOpenDialog(primaryStage)
-                            controller.onLoadSourcePressed(lastFile)
+                            controller.openedAssemblyFile = null
+                            controller.sourceCode = ""
                         }
+                        accelerator = KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN)
+                    }
+                    item("Öffnen...") {
+                        action {
+                            val file: File = asmFileChooser.showOpenDialog(primaryStage) ?: return@action
+                            controller.openedAssemblyFile = file
+                            controller.onLoadSourcePressed(file)
+                        }
+                        accelerator = KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN)
                     }
                     item("Speichern") {
                         action {
-                            if(lastFile == null)
-                                lastFile = asmFileChooser.showSaveDialog(primaryStage)
-                            controller.onSaveSourcePressed(lastFile)
+                            if(controller.openedAssemblyFile == null) {
+                                controller.openedAssemblyFile = asmFileChooser.showSaveDialog(primaryStage) ?: return@action
+                            }
+                            controller.onSaveSourcePressed(controller.openedAssemblyFile!!)
                         }
+                        accelerator = KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN)
                     }
                     item("Speichern unter...") {
                         action {
-                            lastFile = asmFileChooser.showSaveDialog(primaryStage)
-                            controller.onSaveSourcePressed(lastFile)
+                            val file = asmFileChooser.showSaveDialog(primaryStage) ?: return@action
+                            controller.openedAssemblyFile = file
+                            controller.onSaveSourcePressed(file)
                         }
+                        accelerator = KeyCodeCombination(KeyCode.S, KeyCombination.SHIFT_DOWN, KeyCombination.SHORTCUT_DOWN)
                     }
                 }
 
                 menu("Binär") {
                     item("Assemblieren nach...") {
                         action {
-                            val file: File? = binaryFileChooser.showSaveDialog(primaryStage)
+                            val file: File = binaryFileChooser.showSaveDialog(primaryStage) ?: return@action
                             controller.onSaveAssemblyToDisk(file)
                         }
                     }
                     item("Disassemblieren von...") {
                         action {
-                            val file: File? = binaryFileChooser.showOpenDialog(primaryStage)
+                            val file: File = binaryFileChooser.showOpenDialog(primaryStage) ?: return@action
                             controller.onDisassemblePressed(file)
                         }
                     }
                     separator()
                     item("In Speicher laden von...") {
                         action {
-                            val file: File? = binaryFileChooser.showOpenDialog(primaryStage)
+                            val file: File = binaryFileChooser.showOpenDialog(primaryStage) ?: return@action
                             controller.onLoadBinaryToMemoryPressed(file)
                         }
                     }

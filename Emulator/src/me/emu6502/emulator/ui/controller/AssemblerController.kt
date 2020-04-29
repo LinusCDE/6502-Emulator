@@ -1,5 +1,6 @@
 package me.emu6502.emulator.ui.controller
 
+import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import me.emu6502.emulator.Emulator
 import me.emu6502.kotlinutils.ushort
@@ -26,6 +27,8 @@ class AssemblerController: Controller() {
     val statusMessageProperty = SimpleStringProperty("")
     var statusMessage by statusMessageProperty
 
+    val openedAssemblyFileProperty = SimpleObjectProperty<File?>(null)
+    var openedAssemblyFile: File? by openedAssemblyFileProperty
 
     fun onAssembleButtonPressed() {
         val memAddr = memoryAddress.toInt(16)
@@ -47,10 +50,7 @@ class AssemblerController: Controller() {
         }
     }
 
-    fun onLoadSourcePressed(file: File?) {
-        if(file == null)
-            return
-
+    fun onLoadSourcePressed(file: File) {
         sourceCode = file.readText()
         statusMessage = "Datei geladen"
 
@@ -61,17 +61,12 @@ class AssemblerController: Controller() {
         }
     }
 
-    fun onSaveSourcePressed(file: File?) {
-        if(file == null)
-            return
+    fun onSaveSourcePressed(file: File) {
         file.writeText(sourceCode)
         statusMessage = "Datei gespeichert"
     }
 
-    fun onSaveAssemblyToDisk(file: File?) {
-        if(file == null)
-            return
-
+    fun onSaveAssemblyToDisk(file: File) {
         try {
             file.writeBytes(EnhancedAssembler.assemble(sourceCode).toByteArray())
             statusMessage = "Assemblierte Datei gespeichert"
@@ -84,10 +79,7 @@ class AssemblerController: Controller() {
         }
     }
 
-    fun onLoadBinaryToMemoryPressed(file: File?) {
-        if(file == null)
-            return
-
+    fun onLoadBinaryToMemoryPressed(file: File) {
         val bytes = file.readBytes()
         val memAddr = memoryAddress.toInt(16)
         bytes.withIndex().forEach { (index, byte) ->
@@ -102,10 +94,7 @@ class AssemblerController: Controller() {
         mainController.emulator.printStatus()
     }
 
-    fun onDisassemblePressed(file: File?) {
-        if(file == null)
-            return
-
+    fun onDisassemblePressed(file: File) {
         sourceCode = Disassembler.disassembleFully(file.readBytes().toUByteArray())
                 .joinToString(System.lineSeparator())
 

@@ -10,12 +10,13 @@ import me.emu6502.kotlinutils.toString
 import tornadofx.*
 import java.lang.Exception
 
-class MainView: View(title = "6502-Emulator") {
+class MainView: View(title = "6502-Emulator" /* Will get changed by AssemblyView! */) {
     val controller: MainController by inject()
 
     override val root: Parent = borderpane {
         center = splitpane {
-            add(AssemblerView())
+            // Use title provided by assembly view
+            add(AssemblerView().apply { this@MainView.titleProperty.bind(this.titleProperty) })
             add(ConsoleView())
         }
         right = vbox {
