@@ -258,7 +258,10 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
                     } else
                         success = false
                 }
-                if (success) return
+                if (success) {
+                    updatePia(pia)
+                    return
+                }
                 writeLine("Fehlerhafte Eingabe!")
             }
             else -> reportError("Unbekannter Befehl! Tabulatortaste für eine Befehlsübersicht drücken.")

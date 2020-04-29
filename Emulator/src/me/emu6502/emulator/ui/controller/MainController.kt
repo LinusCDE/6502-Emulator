@@ -43,8 +43,8 @@ class MainController: Controller() {
             updatePia = { pia ->
                 uiHandleAsync {
                     for(bit in 0 until 8) {
-                        porta[7 - bit].set(pia.porta.int and (1 shl bit) > 0)
-                        portb[7 - bit].set(pia.portb.int and (1 shl bit) > 0)
+                        porta[7 - bit].set(pia.inspectPorta().int and (1 shl bit) > 0)
+                        portb[7 - bit].set(pia.inspectPortb().int and (1 shl bit) > 0)
                     }
                     outa.set(pia.outa)
                     outb.set(pia.outb)

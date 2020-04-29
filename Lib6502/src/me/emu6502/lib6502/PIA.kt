@@ -87,7 +87,7 @@ class PIA(private val cpu: CPU, position: UShort): Device(position, position plu
     }
 
     override fun getData(address: UShort): UByte {
-        if(request(address)) return 0x00.ubyte
+        if(!request(address)) return 0x00.ubyte
         return when((address - start).int) {
             0 -> { // PORTA
                 if(!outa) _rdya = false
@@ -106,6 +106,10 @@ class PIA(private val cpu: CPU, position: UShort): Device(position, position plu
     }
 
     override fun performClockAction() { }
+
+    override fun toString(): String {
+        return "PORTA: $${_porta}\tPORTB: $${_portb}\tOUTA: ${outa}\tOUTB: ${outb}\tRDYA: ${_rdya}\tRDYB: ${_rdyb}\tInterrupting ${if(irq)  "enabled" else "disabled"}"
+    }
 
     fun reset() {
         _porta = 0.ubyte

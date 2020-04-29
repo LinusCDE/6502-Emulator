@@ -13,36 +13,12 @@ class PIAView: View() {
     val PORTA = Array(8) {
         checkbox("", controller.porta[it]) {
             disableProperty().bind(controller.outa)
-            action {
-                val pia = controller.emulator.pia
-                val mask = (128 shr it)
-                val newPorta = if(isSelected)
-                    (pia.porta.int or mask).ubyte
-                else
-                    (pia.porta.int and mask.inv()).ubyte
-
-                controller.emulator.pia.porta = newPorta
-                if(pia.inspectPorta() != newPorta)
-                    controller.uiHandleAsync { controller.emulator.updatePia(pia) }
-            }
         }
     }
 
     val PORTB = Array(8) {
         checkbox("", controller.portb[it]) {
             disableProperty().bind(controller.outb)
-            action {
-                val pia = controller.emulator.pia
-                val mask = (128 shr it)
-                val newPortb = if(isSelected)
-                    (pia.portb.int or mask).ubyte
-                else
-                    (pia.portb.int and mask.inv()).ubyte
-
-                pia.portb = newPortb
-                if(pia.inspectPortb() != newPortb)
-                    controller.uiHandleAsync { controller.emulator.updatePia(pia) }
-            }
         }
     }
 
@@ -51,12 +27,36 @@ class PIAView: View() {
             hbox {
                 for(cb in PORTA)
                     add(cb)
+                button("Set Port A") {
+                    disableProperty().bind(controller.outa)
+                    action {
+                        var newPortA = 0.ubyte
+                        for(i in PORTA.indices) {
+                            if(PORTA[i].isSelected)
+                                newPortA = (newPortA or (1 shl (7 - i)).ubyte)
+                        }
+                        controller.emulator.pia.porta = newPortA
+                        controller.uiHandleAsync { controller.emulator.updatePia(controller.emulator.pia) }
+                    }
+                }
             }
 
             label(controller.outb.stringBinding { if(it!!) "PORTB (Output)" else "PORTB (Input)" })
             hbox {
                 for(cb in PORTB)
                     add(cb)
+                button("Set Port B") {
+                    disableProperty().bind(controller.outb)
+                    action {
+                        var newPortB = 0.ubyte
+                        for(i in PORTB.indices) {
+                            if(PORTB[i].isSelected)
+                                newPortB = (newPortB or (1 shl (7 - i)).ubyte)
+                        }
+                        controller.emulator.pia.portb = newPortB
+                        controller.uiHandleAsync { controller.emulator.updatePia(controller.emulator.pia) }
+                    }
+                }
             }
         }
 }
