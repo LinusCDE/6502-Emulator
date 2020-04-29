@@ -7,6 +7,7 @@ import me.emu6502.lib6502.Assembler
 import me.emu6502.lib6502.Instruction
 import me.emu6502.lib6502.Instruction.*
 import java.io.ByteArrayOutputStream
+import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 class EnhancedAssembler {
@@ -41,14 +42,18 @@ class EnhancedAssembler {
                     .filter { it isType CodeLine.Companion.LineType.VARIABLE }
                     .map { it.line.split("=") }
                     .map { it[0].trim() to it[1].trim() }
-                    .map { (key, value) -> key to value.replace("$", "$$") }
                     .toMap()
 
             for (line in lines.filter { it isType CodeLine.Companion.LineType.CODE })
                 variables
-                        .filter { line.line.matches(Regex("\\b${Pattern.quote(it.key)}\\b")) }
+                        .filter { line.line.contains(Regex("\\b${Pattern.quote(it.key)}\\b")) }
                         .forEach {
-                            line.line.replace(Regex("\\b${Pattern.quote(it.key)}\\b"), it.key)
+                            val words = line.line.split(' ', '\t').toMutableList()
+                            for(i in words.indices) {
+                                if(words[i] == it.key)
+                                    words[i] = it.value
+                            }
+                            line.line = words.joinToString(" ")
                         }
 
             val byteCodes = arrayListOf<ByteCode>()
@@ -80,13 +85,13 @@ class EnhancedAssembler {
                     if (labelIndexes[containsLabel] != -1) {
                         if (line.startsWith('J', true)) {
                             ByteCode(
-                                    code = Assembler.assemble(line.replace(Regex("\\b$containsLabel\\b"), "$$0000"), null),
+                                    code = Assembler.assemble(line.replace(Regex("\\b$containsLabel\\b"), "$0000"), null),
                                     label = containsLabel,
                                     position = pc
                             )
                         }else if(line.startsWith('B', true)) {
                             ByteCode(
-                                    code = Assembler.assemble(line.replace(Regex("\\b$containsDataLabel\\b"), "$$0000"), null),
+                                    code = Assembler.assemble(line.replace(Regex("\\b$containsDataLabel\\b"), "$0000"), null),
                                     label = containsLabel,
                                     position = pc
                             )
@@ -96,14 +101,14 @@ class EnhancedAssembler {
                     } else {
                         if(line.startsWith('J', true)) {
                             ByteCode(
-                                    code = Assembler.assemble(line.replace(Regex("\\b$containsLabel\\b"), "$$${labelIndexes[containsLabel]?.toString("X4")}"), null),
+                                    code = Assembler.assemble(line.replace(Regex("\\b$containsLabel\\b"), "$${labelIndexes[containsLabel]?.toString("X4")}"), null),
                                     label = "",
                                     position = pc
                             )
                         }else if(line.startsWith('B', true)) {
                             ByteCode(
                                     code = Assembler.assemble(line.replace(Regex("\\b$containsLabel\\b"),
-                                            "$$" + (if(labelIndexes[containsLabel]!! >= pc.int) (labelIndexes[containsLabel]!! - pc.int - 2).ushort else (0xFE - (pc.int - labelIndexes[containsLabel]!!)).ushort).toString("X2")
+                                            "$" + (if(labelIndexes[containsLabel]!! >= pc.int) (labelIndexes[containsLabel]!! - pc.int - 2).ushort else (0xFE - (pc.int - labelIndexes[containsLabel]!!)).ushort).toString("X2")
                                     ), null),
                                     label = "",
                                     position = pc
@@ -114,7 +119,7 @@ class EnhancedAssembler {
                     }
                 }else if(containsDataLabel.isNotEmpty()) {
                     ByteCode(
-                            code = Assembler.assemble(line.replace(Regex("\\b$containsDataLabel\\b"), "$$0000"), null),
+                            code = Assembler.assemble(line.replace(Regex("\\b$containsDataLabel\\b"), "$0000"), null),
                             label = containsDataLabel,
                             position = pc
                     )
