@@ -214,9 +214,9 @@ class Assembler {
                             labelName = line.operator.split(",")[0]
 
                         line.referencedAssemblerLine = lines.firstOrNull { it.assignedMemoryLabel == labelName }
-                                ?: throw AssembleException("Failed to find memory label $labelName!")
+                                ?: throw AssembleException("Failed to find memory label $labelName in line \"$line\"!")
                     }else
-                        throw AssembleException("Mnemonic ${line.instruction.name} unterstützt kein Memory Label!")
+                        throw AssembleException("Mnemonic ${line.instruction.name} (\"$line\") unterstützt kein Memory Label!")
                 }else{
                     if(line.operator != "") {
                         line.resolvedAddressData = line.findAddressMode()?.parse(line.operator) ?:
