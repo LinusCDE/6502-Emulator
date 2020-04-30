@@ -13,6 +13,7 @@ import me.emu6502.emulator.Emulator
 import me.emu6502.emulator.ui.CommandInfo
 import me.emu6502.kotlinutils.int
 import tornadofx.*
+import java.awt.image.BufferedImage
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -20,6 +21,8 @@ class MainController: Controller() {
     val commands = FXCollections.observableArrayList<CommandInfo>()
     val screenImageProperty = SimpleObjectProperty<Image>()
     var screenImage by screenImageProperty
+    val textScreenImageProperty = SimpleObjectProperty<Image>()
+    var textScreenImage by textScreenImageProperty
 
     val console: ConsoleController by inject()
 
@@ -27,6 +30,9 @@ class MainController: Controller() {
     val outa = SimpleBooleanProperty(false)
     val portb = Array(8) { SimpleBooleanProperty(false) }
     val outb = SimpleBooleanProperty(false)
+
+    private var lastScreenUpdateCounter = -1L
+    private var lastTextScreenUpdateCounter = -1L
 
     val emulator = Emulator(
             clear = {  console.clear() },
@@ -37,8 +43,21 @@ class MainController: Controller() {
                 uiHandleSync { alert(Alert.AlertType.ERROR, "Emulator-Fehler", it, ButtonType.OK) }
             },
             updateScreen = {
-                uiHandleAsync {
-                    screenImage = SwingFXUtils.toFXImage(it.bitmapScreen.image, null)
+                if(lastScreenUpdateCounter != it.bitmapScreen.updateCounter) {
+                    uiHandleAsync {
+                        lastScreenUpdateCounter = it.bitmapScreen.updateCounter
+                        val scaled = it.bitmapScreen.createScaled(it.bitmapScreen.width * 2, it.bitmapScreen.height * 2, BufferedImage.SCALE_FAST)
+                        screenImage = SwingFXUtils.toFXImage(scaled, null)
+                    }
+                }
+            },
+            updateTextScreen = {
+                if(lastTextScreenUpdateCounter != it.bitmapScreen.updateCounter) {
+                    uiHandleAsync {
+                        lastTextScreenUpdateCounter = it.bitmapScreen.updateCounter
+                        val scaled = it.bitmapScreen.createScaled(it.bitmapScreen.width * 4, it.bitmapScreen.height * 4, BufferedImage.SCALE_FAST)
+                        textScreenImage = SwingFXUtils.toFXImage(scaled, null)
+                    }
                 }
             },
             updatePia = { pia ->

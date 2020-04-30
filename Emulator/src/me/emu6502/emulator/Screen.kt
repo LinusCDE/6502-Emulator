@@ -27,13 +27,12 @@ open class Screen(width: Int, height: Int, startAddress: UShort): Device(startAd
         }
     }
 
-    fun screenshot() = bitmapScreen.save("screen.bmp")
+    open fun screenshot() = bitmapScreen.save("screen.bmp")
 
-    fun reset() {
+    open fun reset() {
         for (y in 0 until bitmapScreen.height)
             for (x in 0 until bitmapScreen.width)
                 bitmapScreen[x, y] = Color.BLACK
-        screenshot()
     }
 
 }

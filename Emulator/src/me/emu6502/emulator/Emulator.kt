@@ -9,7 +9,8 @@ import java.lang.StringBuilder
 import java.text.NumberFormat
 import kotlin.system.exitProcess
 
-class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> Unit, val updatePia: (PIA) -> Unit,
+class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> Unit,
+               val updateTextScreen: (TextScreen) -> Unit, val updatePia: (PIA) -> Unit,
                val clear: () -> Unit, val write: (String) -> Unit, val writeLine: (String) -> Unit,
                val defineCommand: (name: String, displayName: String, desc: String) -> Unit) {
 
@@ -41,7 +42,7 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
     lateinit var rom: ROM
     lateinit var screen: Screen
     lateinit var charrom: ROM
-    lateinit var textscreen: TextScreen
+    var textscreen: TextScreen? = null
     lateinit var pia: PIA
 
     data class MemoryColorSet(var foregroundColor: VT100ForegroundColor?, var backgroundColor: VT100BackgroundColor?,
@@ -82,8 +83,10 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
         screen = Screen(160, 120, 0xD000.ushort).apply { reset() }
         mainbus.devices.add(screen)
 
-        /*textscreen = TextScreen(40, 25, 0xD004.ushort).apply { reset() }
-        mainbus.devices.add(textscreen)*/
+        if(File("apple1.vid").exists()) {
+            textscreen = TextScreen(40, 25, 0xD010.ushort).apply { reset() }
+            mainbus.devices.add(textscreen!!)
+        }
 
         cpu = CPU(mainbus).apply { PC = 0x0200.ushort }
 
@@ -91,6 +94,8 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
         mainbus.devices.add(pia)
 
         updateScreen(screen)
+        if(textscreen != null)
+            updateTextScreen(textscreen!!)
         updatePia(pia)
     }
 
@@ -208,6 +213,8 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
                 cpu.step()
                 mainbus.performClockActions()
                 updateScreen(screen)
+                if(textscreen != null)
+                    updateTextScreen(textscreen!!)
                 updatePia(pia)
                 //textscreen.screenshot()
             }
@@ -232,6 +239,8 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
                             val sleepTime = millisPerSync - (System.currentTimeMillis() - (startedAt + (syncCount*millisPerSync)))
                             syncCount++
                             updateScreen(screen)
+                            if(textscreen != null)
+                                updateTextScreen(textscreen!!)
                             updatePia(pia)
                             printStatus(overwriteOnly = (syncCount > 0))
 
@@ -240,6 +249,8 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
                         }
                     } while (!breakpoints.contains(cpu.PC) && mainbus.getData(cpu.PC) != 0x00.ubyte)
                     updateScreen(screen)
+                    if(textscreen != null)
+                        updateTextScreen(textscreen!!)
                     updatePia(pia)
                     //textscreen.screenshot()
                     printStatus()

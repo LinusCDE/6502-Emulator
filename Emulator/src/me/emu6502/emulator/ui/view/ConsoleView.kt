@@ -10,10 +10,13 @@ class ConsoleView: View() {
     val controller: ConsoleController by inject()
 
     override val root: Parent = borderpane {
-        center = BasicVT100View(135, 40).apply {
-            controller.writeFunc = { write(it) }
-            controller.writeFunc!!(controller.outputPreConnectCache.toString())
-            controller.outputPreConnectCache = null
+        center = vbox {
+            alignment = Pos.CENTER
+            add(BasicVT100View(135, 44).apply {
+                controller.writeFunc = { write(it) }
+                controller.writeFunc!!(controller.outputPreConnectCache.toString())
+                controller.outputPreConnectCache = null
+            })
         }
 
         bottom = borderpane {

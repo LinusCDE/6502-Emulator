@@ -20,14 +20,34 @@ class MainView: View(title = "6502-Emulator" /* Will get changed by AssemblyView
             add(ConsoleView())
         }
         right = vbox {
+            val screenScale = 1.75
+            val screenWidth = controller.emulator.screen.bitmapScreen.width * screenScale
             titledpane("Screen (\$${controller.emulator.screen.start.toString("X4")})") {
                 isExpanded = true
                 imageview {
-                    val scale = 2.0
-                    fitWidth = 140 * scale
-                    fitHeight = 120 * scale
+                    fitWidth = screenWidth
                     isPreserveRatio = true
                     imageProperty().bind(controller.screenImageProperty)
+                }
+            }
+            titledpane("TextScreen (\$${controller.emulator.textscreen?.start?.toString("X4") ?: "N/A"})") {
+                isExpanded = controller.emulator.textscreen != null
+                if(controller.emulator.textscreen != null) {
+                    imageview {
+                        fitWidth = screenWidth
+                        isPreserveRatio = true
+                        imageProperty().bind(controller.textScreenImageProperty)
+                    }
+                }else {
+                    hbox {
+                        label("Resource benötigt.\n\n" +
+                                "Bitte lege die Datei \"apple1.vid\" in\n" +
+                                "das Programm-Verzeichnis und starte\n" +
+                                "dieses Programm erneut, um diese\n" +
+                                "Komponente verwenden zu können.") {
+                            isDisable = true
+                        }
+                    }
                 }
             }
             titledpane("PIA (\$${controller.emulator.pia.start.toString("X4")})") {
