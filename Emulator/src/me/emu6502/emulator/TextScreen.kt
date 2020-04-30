@@ -5,7 +5,7 @@ import java.awt.Color
 import java.io.DataInputStream
 import java.io.FileInputStream
 
-class TextScreen(width: Int, height: Int, startAddress: UShort): Screen(width, height, startAddress) {
+class TextScreen(width: Int, height: Int, startAddress: UShort): Screen(width*8, height*8, startAddress) {
 
     val charmap = UByteArray2D(128, 8)
     val foregroundColor = Color(0x7b71d5)

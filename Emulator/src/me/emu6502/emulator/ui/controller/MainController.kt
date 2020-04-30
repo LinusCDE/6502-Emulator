@@ -55,8 +55,7 @@ class MainController: Controller() {
                 if(lastTextScreenUpdateCounter != it.bitmapScreen.updateCounter) {
                     uiHandleAsync {
                         lastTextScreenUpdateCounter = it.bitmapScreen.updateCounter
-                        val scaled = it.bitmapScreen.createScaled(it.bitmapScreen.width * 4, it.bitmapScreen.height * 4, BufferedImage.SCALE_FAST)
-                        textScreenImage = SwingFXUtils.toFXImage(scaled, null)
+                        textScreenImage = SwingFXUtils.toFXImage(it.bitmapScreen.image, null)
                     }
                 }
             },
