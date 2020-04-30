@@ -32,6 +32,10 @@ class Assembler {
         open fun isOperatorReferencingMemoryLabel() = instruction.opCodeAddrModes.size > 0 && findOpCode() == null
 
         open fun findAdequateReferenceAddressMode(): AddressMode? {
+            if(operator.endsWith(",X", true) && instruction.isAddressModeSupported(AddressMode.ABSOLUTE_X))
+                return AddressMode.ABSOLUTE_X
+            if(operator.endsWith(",Y", true) && instruction.isAddressModeSupported(AddressMode.ABSOLUTE_Y))
+                return AddressMode.ABSOLUTE_Y
 
             // Only allow ABSOLUTE for referencing directive storage
             if(referencedAssemblerLine != null && referencedAssemblerLine is AssemblerDirectiveLine) {
@@ -174,7 +178,7 @@ class Assembler {
 
 
             // Basic parsing of remaining source lines (assigning of instructions and memory labels to them)
-            // and finding variables
+            // and applying variables
             var prevMemoryLabel: String? = null
             for(line in usefulStringLines) {
                 if(line.endsWith(":")) {
@@ -185,8 +189,8 @@ class Assembler {
                 val spacesplit = line.split(' ')
                 val mnemonic = spacesplit[0]
                 var operator = if(spacesplit.size > 1) spacesplit[1] else ""
-                if(operator in variables)
-                    operator = variables[operator]!!
+                for((varName, varValue) in variables)
+                    operator = operator.replace(varName, varValue)
 
                 val instruction = Instruction.values().firstOrNull {
                     it.name.equals(mnemonic, true)
@@ -205,8 +209,12 @@ class Assembler {
             for(line in lines) {
                 if(line.isOperatorReferencingMemoryLabel()) {
                     if(line.findAdequateReferenceAddressMode() != null) {
-                        line.referencedAssemblerLine = lines.firstOrNull { it.assignedMemoryLabel == line.operator }
-                                ?: throw AssembleException("Failed to find memory label ${line.operator}!")
+                        var labelName = line.operator
+                        if (line.findAdequateReferenceAddressMode() in arrayOf(AddressMode.ABSOLUTE_X, AddressMode.ABSOLUTE_Y))
+                            labelName = line.operator.split(",")[0]
+
+                        line.referencedAssemblerLine = lines.firstOrNull { it.assignedMemoryLabel == labelName }
+                                ?: throw AssembleException("Failed to find memory label $labelName!")
                     }else
                         throw AssembleException("Mnemonic ${line.instruction.name} unterstützt kein Memory Label!")
                 }else{
@@ -245,12 +253,13 @@ class Assembler {
                             line.operator = AddressMode.ZEROPAGE.toString(indirectData) ?: throw AssembleException("Konnte Adresse für \"$line\" nicht kodieren (Offset: $offset)!")
                             line.resolvedAddressData = line.findAddressMode()!!.parse(line.operator)
                         }
-                        AddressMode.ABSOLUTE -> {
+                        in arrayOf(AddressMode.ABSOLUTE, AddressMode.ABSOLUTE_X, AddressMode.ABSOLUTE_Y) -> {
                             if(line.instruction !in ABSOLUTE_LABEL_JUMP_INSTRUCTIONS && line.referencedAssemblerLine !is AssemblerDirectiveLine)
                                 throw AssembleException("Keine absoluten Sprünge für diese Instruction erlaubt: \"$line\"")
                             if(targetMemoryAddress == null)
                                 throw AssembleException("Sprung zu Absoluter Adresse nicht berechenbar, da Speicherort fehlt!")
-                            line.operator = "$" + (targetMemoryAddress + line.referencedAssemblerLine!!.relativeAddress!!).toString("X4")
+                            val suffix = if(addrMode in arrayOf(AddressMode.ABSOLUTE_X, AddressMode.ABSOLUTE_Y)) "," + line.operator.split(',')[1] else ""
+                            line.operator = "$" + (targetMemoryAddress + line.referencedAssemblerLine!!.relativeAddress!!).toString("X4") + suffix
                             line.resolvedAddressData = line.findAddressMode()!!.parse(line.operator)
                         }
                         else -> throw AssembleException("Unerwartet: Sprung-Berechnung zu AddressenTyp $addrMode nicht implementiert!")
