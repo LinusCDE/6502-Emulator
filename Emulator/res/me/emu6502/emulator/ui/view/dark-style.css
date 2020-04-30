@@ -28,8 +28,16 @@
     -fx-fill: #e8c16f !important;
 }
 
+.directive {
+    -fx-font-weight: bold;
+}
+
 .comment {
     -fx-fill: #a3a3a3 !important;
+}
+
+.error {
+    -fx-fill: #e85560 !important;
 }
 
 .memory-label {
