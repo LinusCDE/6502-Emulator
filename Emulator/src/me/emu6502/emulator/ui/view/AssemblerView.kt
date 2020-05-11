@@ -1,7 +1,6 @@
 package me.emu6502.emulator.ui.view
 
 import javafx.application.Platform
-import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Pos
 import javafx.scene.Parent
 import javafx.scene.control.ToggleGroup
@@ -242,12 +241,15 @@ class AssemblerView: View() {
 
     private fun asRegex(addrMode: AddressMode): String {
         if(addrMode == AddressMode.ACCUMULATOR)
-            return "\\bA\\b"
+            return "A"
         //val hex = "[A-Fa-f0-9]{" + addrMode.fixedValueLength + "}";
         val hex = "([A-F0-9]{" + addrMode.fixedValueLength + "}" + "|" + "[a-f0-9]{" + addrMode.fixedValueLength + "})"; // Don't allow case mixing
         val regex = (if(addrMode.prefix != "") Pattern.quote(addrMode.prefix) else "") + hex + (if(addrMode.suffix != "") Pattern.quote(addrMode.suffix) else "")
         return "($regex)"
     }
+
+    val addressModeRegex = Regex("^" + AddressMode.values().map { asRegex(it) }.joinToString("|") + "$")
+
 
     val MNEMONIC_PATTERN = "(" + Instruction.values().map { "\\b${it.name}\\b" }.joinToString("|") + ")"
     val MEMORYLABEL_PATTERN = "([^\n][a-zA-Z0-9_-]*:)"
@@ -261,7 +263,7 @@ class AssemblerView: View() {
             "|(?<COMMENT>$COMMENT_PATTERN)"
     )
 
-    private fun computeHighlighting(text: String, caretPosition: Int): Pair<String?/*styleclass at caret*/, StyleSpans<Collection<String>>> {
+    private fun computeHighlightingOld(text: String, caretPosition: Int): Pair<String?/*styleclass at caret*/, StyleSpans<Collection<String>>> {
         val matcher: Matcher = PATTERN.matcher(text)
         var lastKwEnd = 0
         val spansBuilder = StyleSpansBuilder<Collection<String>>()
@@ -285,6 +287,208 @@ class AssemblerView: View() {
 
 
         return styleClassAtCaret to spansBuilder.create()
+    }
+
+    private enum class LineType {
+        VARIABLE,
+        INSTRUCTION,
+        DIRECTIVE,
+        MEMORY_LABEL,
+        ERROR,
+        UNKNOWN
+    }
+
+    private val lastMemoryLabels = arrayListOf<String>()
+    private val lastDirectiveLabels = arrayListOf<String>()
+
+
+    private fun computeHighlighting(text: String, caretPosition: Int): Pair<String?/*styleclass at caret*/, StyleSpans<Collection<String>>> {
+        val newMemoryLabels = arrayListOf<String>()
+        val newDirectiveLabels = arrayListOf<String>()
+        val spansBuilder = StyleSpansBuilder<Collection<String>>()
+
+        println("LINES:")
+        var lastLineEnd = 0
+        for((lStart, lEnd) in getLineSubstrings(text)) {
+            // Fill line gap
+            if (lStart - lastLineEnd > 0)
+                spansBuilder.add(Collections.emptyList(), lStart - lastLineEnd)
+            lastLineEnd = lEnd
+
+            val fullLine = text.substring(lStart, lEnd)
+            //spansBuilder.add(Collections.singleton("comment"), line.length)
+
+            val semicolonIndex = fullLine.indexOf(';')
+            val (codeLine, commentLine) = if (semicolonIndex == -1)
+                fullLine to ""
+            else
+                fullLine.substring(0, semicolonIndex) to fullLine.substring(semicolonIndex, fullLine.length)
+
+            //println("\"$codeLine\" ; \"$commentLine\"")
+
+            //spansBuilder.add(Collections.singleton("mnemonic"), codeLine.length)
+
+            val words = arrayListOf<String>() // Words (and part word) that arent a comment
+            for((wStart, wEnd) in getWordSubstrings(codeLine)) {
+                var word = codeLine.substring(wStart, wEnd)
+                words.add(word)
+            }
+
+            // Check type of line (and check for obvious errors)
+            lateinit var lineType: LineType
+            var currentInstruction: Instruction? = null
+            if(words.size > 0) {
+                val word = words[0]
+                if (word.startsWith('.')) {
+                    // Valid directive?
+                    if (word.equals(".STRING", true) || word.equals(".BYTE", true)) {
+                        lineType = LineType.DIRECTIVE
+                        if(words.size > 1)
+                            newDirectiveLabels.add(words[1])
+                    } else if(word.equals(".STRING", true))
+                        lineType = LineType.DIRECTIVE
+                    else
+                        lineType = LineType.ERROR // Unknown directive
+                } else if (word.endsWith(":")) {
+                    lineType = if (words.size == 1) LineType.MEMORY_LABEL else LineType.ERROR
+                    newMemoryLabels.add(word.substring(0, word.length - 1))
+                } else if (words.size > 1 && words[1] == "=") {
+                    lineType = LineType.VARIABLE
+                } else {
+                    lineType = LineType.UNKNOWN
+                    for (instr in Instruction.values()) {
+                        if (instr.name.equals(word, true)) {
+                            lineType = LineType.INSTRUCTION
+                            currentInstruction = instr
+                            break
+                        }
+                    }
+                }
+            }
+
+
+            var lastWordEnd = 0
+            var wordIndex = -1
+
+            for((wStart, wEnd) in getWordSubstrings(codeLine)) {
+                // Fill word gap (whitespace)
+                if(wStart - lastWordEnd > 0)
+                    spansBuilder.add(Collections.emptyList(), wStart - lastWordEnd)
+                lastWordEnd = wEnd
+                wordIndex++
+
+                val word = codeLine.substring(wStart, wEnd)
+
+                val type: String? = when(lineType) {
+                    LineType.INSTRUCTION -> {
+                        when(wordIndex) {
+                            0 -> "mnemonic"
+                            1 -> {
+                                val label = if(word.endsWith(",Y", true) || word.endsWith(",X", true)) word.split(',')[0] else word
+                                if(currentInstruction == null || currentInstruction?.opCodeAddrModes.isEmpty())
+                                    "error"
+                                else if(word.matches(addressModeRegex))
+                                    "operator"
+                                else if((currentInstruction.isAddressModeSupported(AddressMode.ZEROPAGE) || currentInstruction.isAddressModeSupported(AddressMode.ABSOLUTE)) && lastMemoryLabels.contains(word))
+                                    "memory-label"
+                                else if(lastMemoryLabels.contains(label) && (currentInstruction.isAddressModeSupported(AddressMode.ABSOLUTE_Y) || currentInstruction.isAddressModeSupported(AddressMode.ABSOLUTE_X)))
+                                    "memory-label"
+                                else if(currentInstruction.isAddressModeSupported(AddressMode.ABSOLUTE) && lastDirectiveLabels.contains(word))
+                                    "memory-label"
+                                else
+                                    null
+                            }
+                            else -> "error"
+                        }
+                    }
+                    LineType.VARIABLE -> {
+                        when(wordIndex) {
+                            0 -> "directive"
+                            1 -> null
+                            2 -> if(word.matches(addressModeRegex)) "operator" else null
+                            else -> "error"
+                        }
+                    }
+                    LineType.DIRECTIVE -> {
+                        when(wordIndex) {
+                            0 -> "directive"
+                            1 -> "memory-label"
+                            2 -> null
+                            else -> "error"
+                        }
+                    }
+                    LineType.MEMORY_LABEL -> "memory-label"
+                    LineType.ERROR -> "error"
+                    LineType.UNKNOWN -> null
+                    else -> null
+                }
+
+                if(type != null)
+                    println("\"$word\": $type")
+                spansBuilder.add(if(type != null) Collections.singleton(type) else Collections.emptyList(), word.length)
+            }
+            // Fill remaining word gap (whitespace)
+            if(lastWordEnd < codeLine.length)
+                spansBuilder.add(Collections.emptyList(), codeLine.length - lastWordEnd)
+
+
+            // Mark comment
+            spansBuilder.add(Collections.singleton("comment"), commentLine.length)
+        }
+
+        // Fill remaining line gap
+        if(lastLineEnd < text.length)
+            spansBuilder.add(Collections.emptyList(), text.length - lastLineEnd)
+
+        lastDirectiveLabels.clear()
+        lastDirectiveLabels.addAll(newDirectiveLabels)
+        lastMemoryLabels.clear()
+        lastMemoryLabels.addAll(newMemoryLabels)
+        return null to spansBuilder.create()
+    }
+
+    private fun getWordSubstrings(line: String): Array<Pair<Int, Int>> {
+        val words = arrayListOf<Pair<Int, Int>>()
+        var currentWordStart: Int = -1
+        var prevChar: Char = ' '
+        for(i in line.indices) {
+            val c = line[i]
+            if(prevChar.isWhitespace() && !c.isWhitespace())
+                currentWordStart = i
+            else if(!prevChar.isWhitespace() && c.isWhitespace()) {
+                words.add(currentWordStart to i)
+            }
+
+            prevChar = c
+        }
+
+        if(!prevChar.isWhitespace())
+            words.add(currentWordStart to line.length)
+
+        return words.toTypedArray()
+    }
+
+    private fun getLineSubstrings(text: String): Array<Pair<Int, Int>> {
+        val lines = arrayListOf<Pair<Int, Int>>()
+        var lastLineStart: Int? = null
+        for(i in text.indices) {
+            val c = text[i]
+            if(lastLineStart == null)
+                lastLineStart = i
+            if(c == '\n') {
+                if(lastLineStart != null) {
+                    lines.add(lastLineStart to i)
+                    lastLineStart = null
+                }else {
+                    lines.add(i to i)
+                }
+            }
+        }
+
+        if(lastLineStart != null)
+            lines.add(lastLineStart to text.length)
+
+        return lines.toTypedArray()
     }
 
     init {
