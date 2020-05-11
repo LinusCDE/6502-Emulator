@@ -134,6 +134,13 @@ class AssemblerView: View() {
                         }
                     }
                 }
+
+                menu("Ansicht") {
+                    item("Pop-Out") {
+                        action { controller.mainController.isAssemblerViewInOwnWindow = true }
+                    }
+                    disableProperty().bind(controller.mainController.isAssemblerViewInOwnWindowProperty)
+                }
             }
             borderpane {
                 left = hbox {

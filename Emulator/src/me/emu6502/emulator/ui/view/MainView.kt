@@ -1,6 +1,5 @@
 package me.emu6502.emulator.ui.view
 
-import javafx.scene.Parent
 import javafx.scene.control.Tooltip
 import javafx.util.Duration
 import me.emu6502.emulator.darkModeEnabled
@@ -13,12 +12,8 @@ import java.lang.Exception
 class MainView: View(title = "6502-Emulator" /* Will get changed by AssemblyView! */) {
     val controller: MainController by inject()
 
-    override val root: Parent = borderpane {
-        center = splitpane {
-            // Use title provided by assembly view
-            add(AssemblerView().apply { this@MainView.titleProperty.bind(this.titleProperty) })
-            add(ConsoleView())
-        }
+    override val root = borderpane {
+        center = pane {  }
         right = vbox {
             val screenScale = 1.75
             val screenWidth = controller.emulator.screen.bitmapScreen.width * screenScale
@@ -97,8 +92,25 @@ class MainView: View(title = "6502-Emulator" /* Will get changed by AssemblyView
 
     init {
         setTitledPaneDuration(150)
+        find<AssemblerView>().apply { this@MainView.titleProperty.bind(this.titleProperty) }
 
         if(darkModeEnabled)
             importStylesheet(MainView::class.java.getResource("dark-style.css").toExternalForm())
+
+        val onChange: (Boolean) -> Unit = { newVal: Boolean? ->
+            if(newVal === true) {
+                root.center = find<ConsoleView>().root
+                find<AssemblerWindow>().onDock()
+            }else {
+                root.center = splitpane {
+                    // Use title provided by assembly view
+                    add<AssemblerView>()
+                    add<ConsoleView>()
+                }
+            }
+        }
+        controller.isAssemblerViewInOwnWindowProperty.onChange(onChange)
+        onChange(controller.isAssemblerViewInOwnWindow) // Trigger onChange
     }
+
 }

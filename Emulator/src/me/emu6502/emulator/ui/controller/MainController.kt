@@ -34,6 +34,10 @@ class MainController: Controller() {
     private var lastScreenUpdateCounter = -1L
     private var lastTextScreenUpdateCounter = -1L
 
+    val isAssemblerViewInOwnWindowProperty = SimpleBooleanProperty(false)
+    var isAssemblerViewInOwnWindow by isAssemblerViewInOwnWindowProperty
+
+
     val emulator = Emulator(
             clear = {  console.clear() },
             write = { text -> console.write(text) },
