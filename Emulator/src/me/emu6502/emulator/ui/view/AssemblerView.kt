@@ -18,6 +18,7 @@ import org.fxmisc.richtext.model.StyleSpans
 import org.fxmisc.richtext.model.StyleSpansBuilder
 import tornadofx.*
 import java.io.File
+import java.lang.Exception
 import java.lang.IndexOutOfBoundsException
 import java.time.Duration
 import java.util.*
@@ -207,12 +208,23 @@ class AssemblerView: View() {
             }
 
             val updateSyntax = {
-                val now = System.currentTimeMillis()
-                val (styleAtCaret, styleSpans) = computeHighlighting(text, caretPosition)
-                lastStyleAtCaret = styleAtCaret
+                try {
+                    val now = System.currentTimeMillis()
+                    val styleSpans = computeHighlighting(text)
 
-                setStyleSpans(0, styleSpans)
-                lastSyntaxUpdate = now
+                    // Find style at caret postion and use it to color the newly typed chars instantly
+                    var pos = 0
+                    for (styleSpan in styleSpans) {
+                        if (pos + styleSpan.length >= caretPosition) {
+                            lastStyleAtCaret = styleSpan.style.firstOrNull()
+                            break
+                        }
+                        pos += styleSpan.length
+                    }
+
+                    setStyleSpans(0, styleSpans)
+                    lastSyntaxUpdate = now
+                }catch (e: Exception) {}
             }
 
             multiPlainChanges().subscribe {
@@ -302,7 +314,7 @@ class AssemblerView: View() {
     private val lastDirectiveLabels = arrayListOf<String>()
 
 
-    private fun computeHighlighting(text: String, caretPosition: Int): Pair<String?/*styleclass at caret*/, StyleSpans<Collection<String>>> {
+    private fun computeHighlighting(text: String): StyleSpans<Collection<String>> {
         val newMemoryLabels = arrayListOf<String>()
         val newDirectiveLabels = arrayListOf<String>()
         val spansBuilder = StyleSpansBuilder<Collection<String>>()
@@ -444,7 +456,7 @@ class AssemblerView: View() {
         lastDirectiveLabels.addAll(newDirectiveLabels)
         lastMemoryLabels.clear()
         lastMemoryLabels.addAll(newMemoryLabels)
-        return null to spansBuilder.create()
+        return spansBuilder.create()
     }
 
     private fun getWordSubstrings(line: String): Array<Pair<Int, Int>> {
