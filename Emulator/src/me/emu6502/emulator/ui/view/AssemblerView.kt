@@ -263,44 +263,6 @@ class AssemblerView: View() {
     val addressModeRegex = Regex("^" + AddressMode.values().map { asRegex(it) }.joinToString("|") + "$")
 
 
-    val MNEMONIC_PATTERN = "(" + Instruction.values().map { "\\b${it.name}\\b" }.joinToString("|") + ")"
-    val MEMORYLABEL_PATTERN = "([^\n][a-zA-Z0-9_-]*:)"
-    val OPERATOR_PATTERN = "([^\n]" + AddressMode.values().map { asRegex(it) }.joinToString("|") + ")"
-    val COMMENT_PATTERN = "(;(.*))"
-
-    val PATTERN = Pattern.compile(
-            "(?<MEMORYLABEL>$MEMORYLABEL_PATTERN)" +
-            "|(?<MNEMONIC>$MNEMONIC_PATTERN)" +
-            "|(?<OPERATOR>$OPERATOR_PATTERN)" +
-            "|(?<COMMENT>$COMMENT_PATTERN)"
-    )
-
-    private fun computeHighlightingOld(text: String, caretPosition: Int): Pair<String?/*styleclass at caret*/, StyleSpans<Collection<String>>> {
-        val matcher: Matcher = PATTERN.matcher(text)
-        var lastKwEnd = 0
-        val spansBuilder = StyleSpansBuilder<Collection<String>>()
-        var styleClassAtCaret: String? = null
-        while (matcher.find()) {
-            val styleClass = when {
-                matcher.group("MNEMONIC") != null -> "mnemonic"
-                matcher.group("MEMORYLABEL") != null -> "memory-label"
-                matcher.group("COMMENT") != null -> "comment"
-                matcher.group("OPERATOR") != null -> "operator"
-                else -> null // Never happens
-            }!!
-            spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd)
-            spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start())
-            lastKwEnd = matcher.end()
-
-            if(caretPosition >= matcher.start() && caretPosition <= matcher.end())
-                styleClassAtCaret = styleClass // Current style has caret in it -> Use the class for new text
-        }
-        spansBuilder.add(Collections.emptyList(), text.length - lastKwEnd)
-
-
-        return styleClassAtCaret to spansBuilder.create()
-    }
-
     private enum class LineType {
         VARIABLE,
         INSTRUCTION,
@@ -319,7 +281,6 @@ class AssemblerView: View() {
         val newDirectiveLabels = arrayListOf<String>()
         val spansBuilder = StyleSpansBuilder<Collection<String>>()
 
-        println("LINES:")
         var lastLineEnd = 0
         for((lStart, lEnd) in getLineSubstrings(text)) {
             // Fill line gap
@@ -335,10 +296,6 @@ class AssemblerView: View() {
                 fullLine to ""
             else
                 fullLine.substring(0, semicolonIndex) to fullLine.substring(semicolonIndex, fullLine.length)
-
-            //println("\"$codeLine\" ; \"$commentLine\"")
-
-            //spansBuilder.add(Collections.singleton("mnemonic"), codeLine.length)
 
             val words = arrayListOf<String>() // Words (and part word) that arent a comment
             for((wStart, wEnd) in getWordSubstrings(codeLine)) {
@@ -435,8 +392,6 @@ class AssemblerView: View() {
                     else -> null
                 }
 
-                if(type != null)
-                    println("\"$word\": $type")
                 spansBuilder.add(if(type != null) Collections.singleton(type) else Collections.emptyList(), word.length)
             }
             // Fill remaining word gap (whitespace)
