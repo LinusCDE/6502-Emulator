@@ -22,7 +22,7 @@
 
 
 .directive {
-    -fx-font-weight: bold;
+    -fx-font-style: italic;
 }
 
 .lineno {
