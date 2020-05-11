@@ -314,7 +314,7 @@ class AssemblerView: View() {
                         lineType = LineType.DIRECTIVE
                         if(words.size > 1)
                             newDirectiveLabels.add(words[1])
-                    } else if(word.equals(".STRING", true))
+                    } else if(word.equals(".ORG", true))
                         lineType = LineType.DIRECTIVE
                     else
                         lineType = LineType.ERROR // Unknown directive
@@ -381,8 +381,8 @@ class AssemblerView: View() {
                     LineType.DIRECTIVE -> {
                         when(wordIndex) {
                             0 -> "directive"
-                            1 -> "memory-label"
-                            2 -> null
+                            1 -> if(words[0].equals(".ORG", true)) "operator" else "memory-label"
+                            2 -> if(words[0].equals(".ORG", true)) "error" else "operator"
                             else -> "error"
                         }
                     }
