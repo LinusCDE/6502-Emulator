@@ -183,7 +183,16 @@ class Emulator(val reportError: (String) -> Unit, val updateScreen: (Screen) -> 
         {
             "q" -> exitProcess(0)
             "ra" -> reset()
-            "rc" -> cpu.reset()
+            "rc" -> {
+                if(runningThread != null) {
+                    try {
+                        runningThread!!.stop()
+                        printStatus()
+                    }catch (e: Exception) { }
+                }
+                cpu.reset()
+
+            }
             "a" -> setUByteOrComplain(cmdArgs, "a <Byte_in_Hex>") { cpu.A = it }
             "x" -> setUByteOrComplain(cmdArgs, "x <Byte_in_Hex>") { cpu.X = it }
             "y" -> setUByteOrComplain(cmdArgs, "y <Byte_in_Hex>") { cpu.Y = it }
