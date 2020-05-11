@@ -48,7 +48,7 @@ class MainView: View(title = "6502-Emulator" /* Will get changed by AssemblyView
             titledpane("PIA (\$${controller.emulator.pia.start.toString("X4")})") {
                 tooltip = Tooltip("Parallel I/O Adapter")
                 isExpanded = true
-                add(PIAView())
+                add<PIAView>()
             }
             titledpane("Befehlsübersicht") {
                 isExpanded = false
