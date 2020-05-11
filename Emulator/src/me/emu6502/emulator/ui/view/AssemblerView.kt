@@ -136,10 +136,23 @@ class AssemblerView: View() {
                 }
 
                 menu("Ansicht") {
-                    item("Pop-Out") {
-                        action { controller.mainController.isAssemblerViewInOwnWindow = true }
+                    checkmenuitem("Pop-Out Assembler") {
+                        accelerator = KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.SHORTCUT_DOWN)
+                        controller.mainController.isAssemblerViewInOwnWindowProperty.bindBidirectional(selectedProperty())
+                        // Disable when checked (since closing programmatically doesnt work currently)
+                        disableProperty().bind(controller.mainController.isAssemblerViewInOwnWindowProperty)
                     }
-                    disableProperty().bind(controller.mainController.isAssemblerViewInOwnWindowProperty)
+                    checkmenuitem ("Screen Groß-Ansicht") {
+                        accelerator = KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.SHORTCUT_DOWN)
+                        controller.mainController.isScreenInOwnWindowProperty.bindBidirectional(selectedProperty())
+                    }
+                    checkmenuitem("TextScreen Groß-Ansicht") {
+                        accelerator = KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.SHORTCUT_DOWN)
+                        controller.mainController.isTextScreenInOwnWindowProperty.bindBidirectional(selectedProperty())
+                        // Disable when textscreen is not available
+                        if(controller.mainController.emulator.textscreen == null)
+                            isDisable = true
+                    }
                 }
             }
             borderpane {

@@ -17,21 +17,25 @@ class MainView: View(title = "6502-Emulator" /* Will get changed by AssemblyView
         right = vbox {
             val screenScale = 1.75
             val screenWidth = controller.emulator.screen.bitmapScreen.width * screenScale
-            titledpane("Screen (\$${controller.emulator.screen.start.toString("X4")})") {
+            titledpane(controller.screenTitleProperty) {
                 isExpanded = true
-                imageview {
+                imageview(controller.screenImageProperty) {
                     fitWidth = screenWidth
                     isPreserveRatio = true
-                    imageProperty().bind(controller.screenImageProperty)
+
+                    // Enlarge on double click
+                    setOnMouseClicked { if(it.clickCount == 2) controller.isScreenInOwnWindow = true }
                 }
             }
-            titledpane("TextScreen (\$${controller.emulator.textscreen?.start?.toString("X4") ?: "N/A"})") {
+            titledpane(controller.textScreenTitleProperty) {
                 isExpanded = controller.emulator.textscreen != null
                 if(controller.emulator.textscreen != null) {
-                    imageview {
+                    imageview(controller.textScreenImageProperty) {
                         fitWidth = screenWidth
                         isPreserveRatio = true
-                        imageProperty().bind(controller.textScreenImageProperty)
+
+                        // Enlarge on double click
+                        setOnMouseClicked { if(it.clickCount == 2) controller.isTextScreenInOwnWindow = true }
                     }
                 }else {
                     hbox {
@@ -97,7 +101,7 @@ class MainView: View(title = "6502-Emulator" /* Will get changed by AssemblyView
         if(darkModeEnabled)
             importStylesheet(MainView::class.java.getResource("dark-style.css").toExternalForm())
 
-        val onChange: (Boolean) -> Unit = { newVal: Boolean? ->
+        val onAssemblyViewChange: (Boolean) -> Unit = { newVal: Boolean? ->
             if(newVal === true) {
                 root.center = find<ConsoleView>().root
                 find<AssemblerWindow>().onDock()
@@ -109,8 +113,26 @@ class MainView: View(title = "6502-Emulator" /* Will get changed by AssemblyView
                 }
             }
         }
-        controller.isAssemblerViewInOwnWindowProperty.onChange(onChange)
-        onChange(controller.isAssemblerViewInOwnWindow) // Trigger onChange
+        controller.isAssemblerViewInOwnWindowProperty.onChange(onAssemblyViewChange)
+        onAssemblyViewChange(controller.isAssemblerViewInOwnWindow) // Trigger onChange
+
+        val onScreenViewChange: (Boolean) -> Unit = { newVal: Boolean? ->
+            if(newVal === true)
+                find<ScreenWindow>().onDock()
+            else
+                find<ScreenWindow>().close()
+        }
+        controller.isScreenInOwnWindowProperty.onChange(onScreenViewChange)
+        onScreenViewChange(controller.isScreenInOwnWindow) // Trigger onChange
+
+        val onTextScreenViewChange: (Boolean) -> Unit = { newVal: Boolean? ->
+            if(newVal === true)
+                find<TextScreenWindow>().onDock()
+            else
+                find<TextScreenWindow>().close()
+        }
+        controller.isTextScreenInOwnWindowProperty.onChange(onTextScreenViewChange)
+        onTextScreenViewChange(controller.isTextScreenInOwnWindow) // Trigger onChange
     }
 
 }

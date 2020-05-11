@@ -4,6 +4,7 @@ import javafx.application.Platform
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.embed.swing.SwingFXUtils
 import javafx.scene.control.Alert
@@ -12,6 +13,7 @@ import javafx.scene.image.Image
 import me.emu6502.emulator.Emulator
 import me.emu6502.emulator.ui.CommandInfo
 import me.emu6502.kotlinutils.int
+import me.emu6502.kotlinutils.toString
 import tornadofx.*
 import java.awt.image.BufferedImage
 import java.util.concurrent.locks.ReentrantLock
@@ -37,6 +39,10 @@ class MainController: Controller() {
     val isAssemblerViewInOwnWindowProperty = SimpleBooleanProperty(false)
     var isAssemblerViewInOwnWindow by isAssemblerViewInOwnWindowProperty
 
+    val isScreenInOwnWindowProperty = SimpleBooleanProperty(false)
+    var isScreenInOwnWindow by isScreenInOwnWindowProperty
+    val isTextScreenInOwnWindowProperty = SimpleBooleanProperty(false)
+    var isTextScreenInOwnWindow by isTextScreenInOwnWindowProperty
 
     val emulator = Emulator(
             clear = {  console.clear() },
@@ -50,7 +56,7 @@ class MainController: Controller() {
                 if(lastScreenUpdateCounter != it.bitmapScreen.updateCounter) {
                     uiHandleAsync {
                         lastScreenUpdateCounter = it.bitmapScreen.updateCounter
-                        val scaled = it.bitmapScreen.createScaled(it.bitmapScreen.width * 2, it.bitmapScreen.height * 2, BufferedImage.SCALE_FAST)
+                        val scaled = it.bitmapScreen.createScaled(it.bitmapScreen.width * 5, it.bitmapScreen.height * 5, BufferedImage.SCALE_FAST)
                         screenImage = SwingFXUtils.toFXImage(scaled, null)
                     }
                 }
@@ -59,7 +65,8 @@ class MainController: Controller() {
                 if(lastTextScreenUpdateCounter != it.bitmapScreen.updateCounter) {
                     uiHandleAsync {
                         lastTextScreenUpdateCounter = it.bitmapScreen.updateCounter
-                        textScreenImage = SwingFXUtils.toFXImage(it.bitmapScreen.image, null)
+                        val scaled = it.bitmapScreen.createScaled(it.bitmapScreen.width * 3, it.bitmapScreen.height * 3, BufferedImage.SCALE_FAST)
+                        textScreenImage = SwingFXUtils.toFXImage(scaled, null)
                     }
                 }
             },
@@ -74,6 +81,12 @@ class MainController: Controller() {
                 }
             }
     )
+
+    val screenTitleProperty = SimpleStringProperty("Screen (\$${emulator.screen.start.toString("X4")})")
+    var screenTitle by screenTitleProperty
+    val textScreenTitleProperty = SimpleStringProperty("TextScreen (\$${emulator.textscreen?.start?.toString("X4") ?: "N/A"})")
+    var textScreenTitle by textScreenTitleProperty
+
 
     val emulationSyncsPerSecondProperty = SimpleIntegerProperty(emulator.syncsPerSecond).apply {
         onChange { emulator.syncsPerSecond = it }
