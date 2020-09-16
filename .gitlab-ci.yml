@@ -6,10 +6,18 @@ variables:
 cache:
   paths:
     - .m2/repository
-    - target/kotlin-ic
-    - target/classes
-    - target/test-classes
-    - target/maven-archiver
+    - Emulator/target/kotlin-ic
+    - Emulator/target/classes
+    - Emulator/target/test-classes
+    - Emulator/target/maven-archiver
+    - Lib6502/target/kotlin-ic
+    - Lib6502/target/classes
+    - Lib6502/target/test-classes
+    - Lib6502/target/maven-archiver
+    - KotlinUtils/target/kotlin-ic
+    - KotlinUtils/target/classes
+    - KotlinUtils/target/test-classes
+    - KotlinUtils/target/maven-archiver
 
 stages:
   - package
