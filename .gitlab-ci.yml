@@ -14,7 +14,7 @@ cache:
 stages:
   - package
 
-package_studipviewapi:
+package_6502emulator:
   stage: package
   script:
     - mvn clean package
