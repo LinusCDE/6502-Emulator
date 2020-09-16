@@ -20,6 +20,6 @@ package_6502emulator:
     - mvn clean package
   artifacts:
     paths:
-      - target/*-with-dependencies.jar
+      - Emulator/target/*-with-dependencies.jar
   tags:
     - docker
